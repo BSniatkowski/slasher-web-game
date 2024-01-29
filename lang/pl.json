@@ -1,0 +1,42 @@
+{
+  "app.form.emailField": {
+    "defaultMessage": "Field must be valid email",
+    "description": "Form error message when field is required."
+  },
+  "app.form.requiredField": {
+    "defaultMessage": "{fieldName} is required",
+    "description": "Form error message when field is required."
+  },
+  "app.form.send": {
+    "defaultMessage": "Send",
+    "description": "Form submit button text."
+  },
+  "app.form.tooLongField": {
+    "defaultMessage": "{fieldName} cannot be longer than {max}",
+    "description": "Form error message when field is required."
+  },
+  "app.layout.about": {
+    "defaultMessage": "About",
+    "description": "Navigation link to the 'About' section."
+  },
+  "app.layout.figma": {
+    "defaultMessage": "Website Figma project",
+    "description": "Navigation link to the project's figma section."
+  },
+  "app.layout.footer.myLinks": {
+    "defaultMessage": "My links",
+    "description": "Footer link to personal links or information."
+  },
+  "app.layout.footer.siteLinks": {
+    "defaultMessage": "Site Links",
+    "description": "Footer link to general site links."
+  },
+  "app.layout.home": {
+    "defaultMessage": "Home",
+    "description": "Navigation link to the 'Home' page."
+  },
+  "app.layout.repository": {
+    "defaultMessage": "Current project's repository",
+    "description": "Navigation link to the project's repository section."
+  }
+}

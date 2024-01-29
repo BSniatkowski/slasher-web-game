@@ -28,7 +28,7 @@ yarn storybook
 yarn extract
 ```
 
-**To compile optimized messeges for EN and PL**
+**To compile optimized messages for EN and PL**
 
 ```sh
 yarn compile

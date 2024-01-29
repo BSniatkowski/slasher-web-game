@@ -4065,10 +4065,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/stats.js@npm:*":
+  version: 0.17.3
+  resolution: "@types/stats.js@npm:0.17.3"
+  checksum: ccccc992c6dfe08fb85049aa3ce44ca7e428db8da4a3edd20298f1c8b72768021fa8bacdfbe8e9735a7552ee5d57f667c6f557050ad2d9a87b699b3566a6177a
+  languageName: node
+  linkType: hard
+
 "@types/stylis@npm:4.2.0":
   version: 4.2.0
   resolution: "@types/stylis@npm:4.2.0"
   checksum: c76c13e76ca485f598a13984cfb5e07bb88a851da5bee213587424a5f101f182c74f4f92d633cebf9abcec40ccebb645d600d184b7e4b42793e3eeca8729b110
+  languageName: node
+  linkType: hard
+
+"@types/three@npm:^0.160.0":
+  version: 0.160.0
+  resolution: "@types/three@npm:0.160.0"
+  dependencies:
+    "@types/stats.js": "npm:*"
+    "@types/webxr": "npm:*"
+    fflate: "npm:~0.6.10"
+    meshoptimizer: "npm:~0.18.1"
+  checksum: a2b98a2f2b718851850e09a66553249398a4e6ddf1dd46bbb0a7721a8656f2a38aad4e5a0ef26723f07bdc7c2cd277558e525296d4e482714c5ed100fc7e752a
   languageName: node
   linkType: hard
 
@@ -4090,6 +4109,13 @@ __metadata:
   version: 9.0.7
   resolution: "@types/uuid@npm:9.0.7"
   checksum: b329ebd4f9d1d8e08d4f2cc211be4922d70d1149f73d5772630e4a3acfb5170c6d37b3d7a39a0412f1a56e86e8a844c7f297c798b082f90380608bf766688787
+  languageName: node
+  linkType: hard
+
+"@types/webxr@npm:*":
+  version: 0.5.11
+  resolution: "@types/webxr@npm:0.5.11"
+  checksum: b3abb5d8e43072d33844e25927ec0f335b01c1e41332d2064d4a185325bdbef9ae80207d9c1ec89c2dcc470ee4aedd0ad7717bab369fa1e9706f01984b628c59
   languageName: node
   linkType: hard
 
@@ -6481,6 +6507,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:~0.6.10":
+  version: 0.6.10
+  resolution: "fflate@npm:0.6.10"
+  checksum: c452f720e4cb404b300fceb8ef0bdf345f18fbfd3f57f7d0974dce5f5e2ac0e8dd4b6ff4bb7061ae74fd919b9c707172f9dbd44d91149b1137199b8c705768f1
+  languageName: node
+  linkType: hard
+
 "file-entry-cache@npm:^6.0.1":
   version: 6.0.1
   resolution: "file-entry-cache@npm:6.0.1"
@@ -8222,6 +8255,13 @@ __metadata:
   version: 1.4.1
   resolution: "merge2@npm:1.4.1"
   checksum: 254a8a4605b58f450308fc474c82ac9a094848081bf4c06778200207820e5193726dc563a0d2c16468810516a5c97d9d3ea0ca6585d23c58ccfff2403e8dbbeb
+  languageName: node
+  linkType: hard
+
+"meshoptimizer@npm:~0.18.1":
+  version: 0.18.1
+  resolution: "meshoptimizer@npm:0.18.1"
+  checksum: 8a825c58b20b65585e8d00788843929b60c66ba4297e89afaa49f7c51ab9a0f7b9130f90cc9ad1b9b48b3d1bee3beb1bc93608acba0d73e78995c3e6e5ca436b
   languageName: node
   linkType: hard
 
@@ -10063,6 +10103,7 @@ __metadata:
     "@types/node": "npm:^20.10.5"
     "@types/react": "npm:^18.2.43"
     "@types/react-dom": "npm:^18.2.17"
+    "@types/three": "npm:^0.160.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.14.0"
     "@typescript-eslint/parser": "npm:^6.14.0"
     "@vitejs/plugin-react": "npm:^4.2.1"
@@ -10082,6 +10123,7 @@ __metadata:
     react-intl: "npm:^6.6.1"
     storybook: "npm:7.6.6"
     styled-components: "npm:^6.1.6"
+    three: "npm:^0.160.1"
     typescript: "npm:^5.2.2"
     vite: "npm:4.5.1"
     vite-plugin-checker: "npm:^0.6.2"
@@ -10507,6 +10549,13 @@ __metadata:
   version: 0.2.0
   resolution: "text-table@npm:0.2.0"
   checksum: 02805740c12851ea5982686810702e2f14369a5f4c5c40a836821e3eefc65ffeec3131ba324692a37608294b0fd8c1e55a2dd571ffed4909822787668ddbee5c
+  languageName: node
+  linkType: hard
+
+"three@npm:^0.160.1":
+  version: 0.160.1
+  resolution: "three@npm:0.160.1"
+  checksum: b14b54a8b0799bc337ea2a841a1f01322dc50198d8a438ff4fbdf83ad95a15bd405ba43bd398c05b1ffc2e40a7685b73481a048c288389acb949cea5510269ea
   languageName: node
   linkType: hard
 

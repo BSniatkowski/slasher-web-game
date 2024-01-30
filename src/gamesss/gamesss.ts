@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from 'three'
 
-import { TAnimate, TDispose, TInitializeGame, TPause } from './Game.types'
+import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 

@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react'
 
-import { initializeGame } from '../../../Game/Game'
+import { initializeGame } from '../../../gamesss/gamesss'
 
 const ThreeContainer = () => {
     const rendererRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
         if (rendererRef.current) {
-            const Game = initializeGame(rendererRef)
+            const game = initializeGame(rendererRef)
 
             return () => {
-                Game.dispose()
+                game.dispose()
             }
         }
     }, [])

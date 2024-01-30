@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { initializeGame } from '../../../game/gamesss'
+import { initializeGame } from '../../../game/game'
 
 const ThreeContainer = () => {
     const rendererRef = useRef<HTMLDivElement | null>(null)

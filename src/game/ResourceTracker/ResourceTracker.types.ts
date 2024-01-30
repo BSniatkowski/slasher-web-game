@@ -24,3 +24,5 @@ export type TCreateResourceTracker = (Scene: Scene) => {
     disposeMultipleTrackedResources: TDisposeMultipleTrackedResources
     disposeAllResources: TDisposeAllResources
 }
+
+export type TResourceTracker = ReturnType<TCreateResourceTracker>

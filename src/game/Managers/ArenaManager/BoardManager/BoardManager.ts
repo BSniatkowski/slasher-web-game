@@ -17,7 +17,7 @@ export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker
     const generateBoard: TGenerateBoard = () => {
         const baseBoard = createBaseBoard({ maxSize })
 
-        const walkableBoard = Walker({ baseBoard, walkable: 0.7 })
+        const walkableBoard = Walker({ baseBoard, walkable: 0.1 })
 
         state.board = walkableBoard
 

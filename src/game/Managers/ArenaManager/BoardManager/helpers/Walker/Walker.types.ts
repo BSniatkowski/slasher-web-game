@@ -14,7 +14,16 @@ export interface IWalkerState {
         x: number
         y: number
     }
+    vacantPositions: Array<{
+        x: number
+        y: number
+    }>
 }
+
+export type TUpdateVacantPositions = (
+    state: IWalkerState,
+    position: { x: number; y: number },
+) => void
 
 export type TCheckPositionOnBoard = (
     state: IWalkerState,
@@ -22,6 +31,11 @@ export type TCheckPositionOnBoard = (
 ) => void
 
 export type TSetActualPosition = (state: IWalkerState, position: { x: number; y: number }) => void
+
+export type TIsPartOfActualMap = (
+    board: Array<Array<boolean>>,
+    position: { x: number; y: number },
+) => boolean
 
 export type TFindStartPoint = (state: IWalkerState) => void
 

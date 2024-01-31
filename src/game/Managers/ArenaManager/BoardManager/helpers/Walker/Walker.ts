@@ -2,13 +2,25 @@ import {
     IWalkerState,
     TCheckPositionOnBoard,
     TFindStartPoint,
+    TIsPartOfActualMap,
     TSetActualPosition,
+    TUpdateVacantPositions,
     TWalk as TWalk,
     TWalker,
 } from './Walker.types'
 
+const isPartOfActualMap: TIsPartOfActualMap = (board, { x, y }) =>
+    board?.[x - 1]?.[y] || board?.[x]?.[y - 1] || board?.[x + 1]?.[y] || board?.[x]?.[y - 1]
+
+const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
+    state.vacantPositions = state.vacantPositions.filter(
+        (position) => !(position.x === x && position.y === y),
+    )
+}
+
 const checkPositionOnBoard: TCheckPositionOnBoard = (state, { x, y }) => {
     state.board[x][y] = true
+    updateVacantPositions(state, { x, y })
 }
 
 const setActualPosition: TSetActualPosition = (state, position) => {
@@ -17,19 +29,27 @@ const setActualPosition: TSetActualPosition = (state, position) => {
 }
 
 const findStartPoint: TFindStartPoint = (state) => {
-    // console.log('Finding new start point...')
+    const { board, maxX, maxY, vacantPositions } = state
 
-    const { board, maxX, maxY } = state
+    const vacantAndPartOfMap = vacantPositions.filter((pos) => isPartOfActualMap(board, pos))
 
-    const position = {
-        x: Math.round(Math.random() * maxX),
-        y: Math.round(Math.random() * maxY),
-    }
+    const position =
+        vacantPositions.length > 0
+            ? vacantAndPartOfMap[
+                  Math.abs(Math.round(Math.random() * vacantAndPartOfMap.length - 1))
+              ]
+            : {
+                  x: Math.abs(Math.round(Math.random() * maxX - 1)),
+                  y: Math.abs(Math.round(Math.random() * maxY - 1)),
+              }
 
     if (
-        board?.[position.x]?.[position.y] === undefined ||
-        board?.[position.x]?.[position.y] === true
-    ) {
+        (vacantPositions.length === 0 && board?.[position.x]?.[position.y] === true) ||
+        position === undefined
+    )
+        return
+
+    if (board?.[position.x]?.[position.y] !== false) {
         findStartPoint(state)
         return
     }
@@ -38,8 +58,6 @@ const findStartPoint: TFindStartPoint = (state) => {
 }
 
 const walk: TWalk = (state) => {
-    // console.log('Walking...')
-
     const directionValue = Math.round(Math.random() * 100)
 
     const {
@@ -48,18 +66,6 @@ const walk: TWalk = (state) => {
         maxY,
         actualPosition: { x, y },
     } = state
-
-    if (
-        board?.[x - 1]?.[y] === true &&
-        board?.[x]?.[y - 1] === true &&
-        board?.[x + 1]?.[y] === true &&
-        board?.[x]?.[y + 1] === true
-    ) {
-        findStartPoint(state)
-
-        walk(state)
-        return
-    }
 
     if (directionValue <= 25 && y + 1 < maxY && !board[x][y + 1]) {
         setActualPosition(state, { x, y: y + 1 })
@@ -77,6 +83,8 @@ const walk: TWalk = (state) => {
         setActualPosition(state, { x: x - 1, y })
         return
     }
+
+    findStartPoint(state)
 }
 
 export const Walker: TWalker = ({ baseBoard, walkable }) => {
@@ -85,18 +93,29 @@ export const Walker: TWalker = ({ baseBoard, walkable }) => {
         maxX: baseBoard.length,
         maxY: baseBoard[0].length,
         actualPosition: {
-            x: 0,
-            y: 0,
+            x: Math.round(baseBoard.length / 2),
+            y: Math.round(baseBoard[0].length / 2),
         },
+        vacantPositions: baseBoard
+            .map((x, indexX) =>
+                x
+                    .map(
+                        (y, indexY) =>
+                            !y && {
+                                x: indexX,
+                                y: indexY,
+                            },
+                    )
+                    .filter((y) => y),
+            )
+            .reduce((acc, el) => acc.concat(el), []) as Array<{ x: number; y: number }>,
     }
-
-    findStartPoint(state)
 
     const maxSteps = Math.round(
         baseBoard.length * baseBoard[0].length * (walkable >= 0 && walkable <= 1 ? walkable : 0.5),
     )
 
-    for (let step = 1; step < maxSteps; step++) {
+    for (let step = 0; step < maxSteps; step++) {
         walk(state)
     }
 

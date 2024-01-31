@@ -9,7 +9,7 @@ export const initializeGame: TInitializeGame = (ref) => {
     const Camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     const Renderer = new WebGLRenderer()
 
-    Camera.position.set(100, 100, 100)
+    Camera.position.set(100, 100, 150)
 
     Renderer.setSize(window.innerWidth - 18, window.innerHeight)
 

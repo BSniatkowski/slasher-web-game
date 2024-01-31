@@ -60,6 +60,7 @@ const RAW_RUNTIME_STATE =
           ["storybook", "npm:7.6.6"],\
           ["styled-components", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:6.1.6"],\
           ["three", "npm:0.160.1"],\
+          ["three-pathfinding", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:1.2.0"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vite", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:4.5.1"],\
           ["vite-plugin-checker", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:0.6.2"],\
@@ -13786,6 +13787,7 @@ const RAW_RUNTIME_STATE =
           ["storybook", "npm:7.6.6"],\
           ["styled-components", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:6.1.6"],\
           ["three", "npm:0.160.1"],\
+          ["three-pathfinding", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:1.2.0"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vite", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:4.5.1"],\
           ["vite-plugin-checker", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:0.6.2"],\
@@ -14281,6 +14283,28 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../AppData/Local/Yarn/Berry/cache/three-npm-0.160.1-89ccf09ca3-10c0.zip/node_modules/three/",\
         "packageDependencies": [\
           ["three", "npm:0.160.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["three-pathfinding", [\
+      ["npm:1.2.0", {\
+        "packageLocation": "../../../AppData/Local/Yarn/Berry/cache/three-pathfinding-npm-1.2.0-31281dc586-10c0.zip/node_modules/three-pathfinding/",\
+        "packageDependencies": [\
+          ["three-pathfinding", "npm:1.2.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:1.2.0", {\
+        "packageLocation": "./.yarn/__virtual__/three-pathfinding-virtual-69ae18a83e/4/AppData/Local/Yarn/Berry/cache/three-pathfinding-npm-1.2.0-31281dc586-10c0.zip/node_modules/three-pathfinding/",\
+        "packageDependencies": [\
+          ["three-pathfinding", "virtual:637b63bf88ff6fe45f85050f5d1d553380c8f63c26a864b0079289e11e6a0a8baeda43ddf9dcc98b73e70674755a26f5ff1ada923b54f3a9dd908f8d69b14ebd#npm:1.2.0"],\
+          ["@types/three", "npm:0.160.0"],\
+          ["three", "npm:0.160.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/three",\
+          "three"\
         ],\
         "linkType": "HARD"\
       }]\

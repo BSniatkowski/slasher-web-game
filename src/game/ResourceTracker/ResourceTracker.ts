@@ -4,6 +4,7 @@ import {
     TDisposeAllResources,
     TDisposeMultipleTrackedResources,
     TDisposeTrackedResource,
+    TGetTrackedResource,
     TTrackResource,
 } from './ResourceTracker.types'
 
@@ -11,11 +12,18 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const state: IResourceTrackerState = { Scene, resources: [] }
 
     const trackResource: TTrackResource = (resource) => {
+        console.log(`Resource of id: ${resource.id} is now tracked.`)
+
         state.resources = [...state.resources, resource]
     }
 
+    const getTrackedResource: TGetTrackedResource = (id) =>
+        state.resources.find((resource) => resource.id === id)?.resource
+
     const disposeTrackedResource: TDisposeTrackedResource = (id) => {
         const resource = state.resources.find((resource) => resource.id === id)?.resource
+
+        console.log(`Resource of id: ${id} was safely dispose.`)
 
         if (!resource) {
             console.warn(
@@ -70,6 +78,7 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
 
     return {
         trackResource,
+        getTrackedResource,
         disposeTrackedResource,
         disposeMultipleTrackedResources,
         disposeAllResources,

@@ -24,6 +24,8 @@ export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker
         state.board = walkableBoard
 
         const boardModel = createBoardModel({ board: walkableBoard })
+        boardModel.matrixAutoUpdate = false
+        boardModel.updateMatrix()
 
         state.boardModel = boardModel
 

@@ -15,6 +15,8 @@ export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker
     }
 
     const generateBoard: TGenerateBoard = () => {
+        if (state.boardModel) ResourceTracker.disposeTrackedResource('board')
+
         const baseBoard = createBaseBoard({ maxSize })
 
         const walkableBoard = Walker({ baseBoard, walkable: 0.1 })

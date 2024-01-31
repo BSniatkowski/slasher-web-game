@@ -13,9 +13,14 @@ const isPartOfActualMap: TIsPartOfActualMap = (board, { x, y }) =>
     board?.[x - 1]?.[y] || board?.[x]?.[y - 1] || board?.[x + 1]?.[y] || board?.[x]?.[y - 1]
 
 const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
-    state.vacantPositions = state.vacantPositions.filter(
-        (position) => !(position.x === x && position.y === y),
-    )
+    const vacantPositions = []
+
+    for (const vacantPosition of state.vacantPositions) {
+        if (!(vacantPosition.x === x && vacantPosition.y === y))
+            vacantPositions.push(vacantPosition)
+    }
+
+    state.vacantPositions = vacantPositions
 }
 
 const checkPositionOnBoard: TCheckPositionOnBoard = (state, { x, y }) => {
@@ -31,7 +36,11 @@ const setActualPosition: TSetActualPosition = (state, position) => {
 const findStartPoint: TFindStartPoint = (state) => {
     const { board, maxX, maxY, vacantPositions } = state
 
-    const vacantAndPartOfMap = vacantPositions.filter((pos) => isPartOfActualMap(board, pos))
+    const vacantAndPartOfMap = []
+
+    for (const vacantPosition of vacantPositions) {
+        if (isPartOfActualMap(board, vacantPosition)) vacantAndPartOfMap.push(vacantPosition)
+    }
 
     const position =
         vacantPositions.length > 0

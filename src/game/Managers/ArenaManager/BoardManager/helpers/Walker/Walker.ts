@@ -2,15 +2,11 @@ import {
     IWalkerState,
     TCheckPositionOnBoard,
     TFindStartPoint,
-    TIsPartOfActualMap,
     TSetActualPosition,
     TUpdateVacantPositions,
     TWalk as TWalk,
     TWalker,
 } from './Walker.types'
-
-const isPartOfActualMap: TIsPartOfActualMap = (board, { x, y }) =>
-    board?.[x - 1]?.[y] || board?.[x]?.[y - 1] || board?.[x + 1]?.[y] || board?.[x]?.[y - 1]
 
 const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
     const vacantPositions = []
@@ -19,6 +15,11 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
         if (!(vacantPosition.x === x && vacantPosition.y === y))
             vacantPositions.push(vacantPosition)
     }
+
+    if (state.board?.[x - 1]?.[y] === false) vacantPositions.push({ x, y })
+    if (state.board?.[x]?.[y - 1] === false) vacantPositions.push({ x, y })
+    if (state.board?.[x + 1]?.[y] === false) vacantPositions.push({ x, y })
+    if (state.board?.[x]?.[y - 1] === false) vacantPositions.push({ x, y })
 
     state.vacantPositions = vacantPositions
 }
@@ -34,34 +35,13 @@ const setActualPosition: TSetActualPosition = (state, position) => {
 }
 
 const findStartPoint: TFindStartPoint = (state) => {
-    const { board, maxX, maxY, vacantPositions } = state
-
-    const vacantAndPartOfMap = []
-
-    for (const vacantPosition of vacantPositions) {
-        if (isPartOfActualMap(board, vacantPosition)) vacantAndPartOfMap.push(vacantPosition)
-    }
+    const { vacantPositions } = state
 
     const position =
-        vacantPositions.length > 0
-            ? vacantAndPartOfMap[
-                  Math.abs(Math.round(Math.random() * vacantAndPartOfMap.length - 1))
-              ]
-            : {
-                  x: Math.abs(Math.round(Math.random() * maxX - 1)),
-                  y: Math.abs(Math.round(Math.random() * maxY - 1)),
-              }
+        vacantPositions.length > 0 &&
+        vacantPositions[Math.abs(Math.round(Math.random() * vacantPositions.length - 1))]
 
-    if (
-        (vacantPositions.length === 0 && board?.[position.x]?.[position.y] === true) ||
-        position === undefined
-    )
-        return
-
-    if (board?.[position.x]?.[position.y] !== false) {
-        findStartPoint(state)
-        return
-    }
+    if (!position) return
 
     setActualPosition(state, position)
 }
@@ -105,20 +85,10 @@ export const Walker: TWalker = ({ baseBoard, walkable }) => {
             x: Math.round(baseBoard.length / 2),
             y: Math.round(baseBoard[0].length / 2),
         },
-        vacantPositions: baseBoard
-            .map((x, indexX) =>
-                x
-                    .map(
-                        (y, indexY) =>
-                            !y && {
-                                x: indexX,
-                                y: indexY,
-                            },
-                    )
-                    .filter((y) => y),
-            )
-            .reduce((acc, el) => acc.concat(el), []) as Array<{ x: number; y: number }>,
+        vacantPositions: [],
     }
+
+    updateVacantPositions(state, state.actualPosition)
 
     const maxSteps = Math.round(
         baseBoard.length * baseBoard[0].length * (walkable >= 0 && walkable <= 1 ? walkable : 0.5),

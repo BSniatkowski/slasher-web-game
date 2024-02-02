@@ -70,7 +70,13 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const goToPosition = (state: IPlayerManagerState) => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
-        const intersects = state.raycaster.intersectObjects(Scene.children)
+        const board = ResourceTracker.getTrackedResource('board')
+
+        console.log(board)
+
+        if (!board) return
+
+        const intersects = state.raycaster.intersectObjects([board])
 
         const destination = intersects.length > 0 && intersects[0].point
 

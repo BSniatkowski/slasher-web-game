@@ -1,4 +1,12 @@
-import { Camera, CylinderGeometry, Mesh, MeshBasicMaterial, Raycaster, Scene, Vector2 } from 'three'
+import {
+    CylinderGeometry,
+    Mesh,
+    MeshBasicMaterial,
+    PerspectiveCamera,
+    Raycaster,
+    Scene,
+    Vector2,
+} from 'three'
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 
@@ -18,7 +26,7 @@ export type TCreatePlayerManager = ({
 }: {
     ref: HTMLCanvasElement
     Scene: Scene
-    Camera: Camera
+    Camera: PerspectiveCamera
     ResourceTracker: TResourceTracker
 }) => {
     init: () => void

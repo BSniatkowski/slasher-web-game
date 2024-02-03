@@ -8,6 +8,7 @@ import {
     Vector3,
 } from 'three'
 
+import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
 
@@ -23,26 +24,19 @@ export const createPlayerManager: TCreatePlayerManager = ({
         raycaster: new Raycaster(),
     }
 
-    const lookCameraAtPlayer = (state: IPlayerManagerState) => {
-        const playerPosition = state.player?.position
+    const CameraManager = createCameraManager({ Camera, playerManagerState: state })
 
-        if (!playerPosition) return
-
-        Camera.position.copy(playerPosition).setZ(playerPosition.z + 20)
-
-        console.log(playerPosition, Camera.position)
-    }
-
-    const updatePlayerPosition = (state: IPlayerManagerState, destination) => {
-        state.player?.position.set(destination.x, destination.y, 10)
-        lookCameraAtPlayer(state)
+    const updatePlayerPosition = (state: IPlayerManagerState, destination: Vector3) => {
+        state.player?.position.copy(destination).add(new Vector3(0, 0, 0.25))
+        CameraManager.lookCameraAtPlayer()
     }
 
     const initPlayer = (state: IPlayerManagerState) => {
-        const geometry = new CylinderGeometry()
+        const geometry = new CylinderGeometry(0.25, 0.25, 0.5)
         const material = new MeshBasicMaterial({ color: 'green' })
 
         const playerMesh = new Mesh(geometry, material)
+        playerMesh.rotateX(MathUtils.degToRad(90))
 
         ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
 
@@ -59,7 +53,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         board.geometry.computeBoundingBox()
         board.geometry.boundingBox?.getCenter(centerVector)
 
-        updatePlayerPosition(state, { ...centerVector, z: 10 })
+        updatePlayerPosition(state, centerVector)
     }
 
     const updatePointer: TUpdatePointer = (state, event) => {
@@ -71,8 +65,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
         state.raycaster.setFromCamera(state.pointer, Camera)
 
         const board = ResourceTracker.getTrackedResource('board')
-
-        console.log(board)
 
         if (!board) return
 
@@ -89,12 +81,13 @@ export const createPlayerManager: TCreatePlayerManager = ({
         ref,
         keybindings: {
             contextmenu: () => goToPosition(state),
-            pointermove: (event) => updatePointer(state, event),
+            pointermove: (event) => updatePointer(state, event as PointerEvent),
         },
     })
 
     const init = () => {
         initPlayer(state)
+        CameraManager.init()
         InputsManager.init()
     }
 

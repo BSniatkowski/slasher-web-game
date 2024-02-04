@@ -8,9 +8,10 @@ import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 export const initializeGame: TInitializeGame = (ref) => {
     const Scene = new ThreeScene()
     const Camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    const Renderer = new WebGLRenderer()
+    const Renderer = new WebGLRenderer({ antialias: true })
 
     Renderer.setSize(window.innerWidth - 18, window.innerHeight)
+    Renderer.setPixelRatio(window.devicePixelRatio)
 
     if (ref.current) ref.current.appendChild(Renderer.domElement)
 

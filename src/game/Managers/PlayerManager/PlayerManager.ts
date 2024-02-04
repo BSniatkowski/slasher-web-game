@@ -4,6 +4,7 @@ import {
     Mesh,
     MeshBasicMaterial,
     Raycaster,
+    SphereGeometry,
     Vector2,
     Vector3,
 } from 'three'
@@ -56,6 +57,98 @@ export const createPlayerManager: TCreatePlayerManager = ({
         updatePlayerPosition(state, centerVector)
     }
 
+    const initPathfinding = (state: IPlayerManagerState) => {
+        const board = ResourceTracker.getTrackedResource('board')
+
+        if (!board) return
+
+        const pointsArray = board.geometry.getAttribute('position').array
+
+        const graphPolygons: Array<Vector2> = []
+
+        for (let polygonIndex = 0; polygonIndex < pointsArray.length; polygonIndex += 3) {
+            graphPolygons.push(
+                new Vector2(pointsArray[polygonIndex], pointsArray[polygonIndex + 1]),
+            )
+        }
+
+        const polygonGeometry = new SphereGeometry(0.1, 8, 0.1)
+        const polygonMaterial = new MeshBasicMaterial({ color: 'blue' })
+
+        const polygonMesh = new Mesh(polygonGeometry, polygonMaterial)
+        polygonMesh.matrixAutoUpdate = false
+
+        const uniquePolygonsForPresentation = graphPolygons.length > 0 ? [graphPolygons[0]] : []
+
+        for (const polygon of graphPolygons) {
+            if (
+                !uniquePolygonsForPresentation.find(
+                    ({ x, y }) => polygon.x === x && polygon.y === y,
+                )
+            )
+                uniquePolygonsForPresentation.push(polygon)
+        }
+
+        for (
+            let polygonIndex = 0;
+            polygonIndex < uniquePolygonsForPresentation.length;
+            polygonIndex++
+        ) {
+            const newPolygonMesh = polygonMesh.clone()
+            newPolygonMesh.position.set(
+                uniquePolygonsForPresentation[polygonIndex].x,
+                uniquePolygonsForPresentation[polygonIndex].y,
+                0.05,
+            )
+            newPolygonMesh.updateMatrix()
+
+            ResourceTracker.trackResource({
+                id: `polygon${polygonIndex}`,
+                resource: newPolygonMesh,
+            })
+            Scene.add(newPolygonMesh)
+        }
+
+        const centroidsPoints = []
+
+        for (
+            let graphPolygonIndex = 0;
+            graphPolygonIndex < graphPolygons.length;
+            graphPolygonIndex += 3
+        ) {
+            const centroid = new Vector2()
+
+            centroid
+                .addVectors(graphPolygons[graphPolygonIndex], graphPolygons[graphPolygonIndex + 1])
+                .add(graphPolygons[graphPolygonIndex + 2])
+                .multiplyScalar(1 / 3)
+
+            centroidsPoints.push(centroid)
+        }
+
+        const centroidGeometry = new SphereGeometry(0.1, 8, 0.1)
+        const centroidMaterial = new MeshBasicMaterial({ color: 'red' })
+
+        const centroidMesh = new Mesh(centroidGeometry, centroidMaterial)
+        centroidMesh.matrixAutoUpdate = false
+
+        for (let centroidIndex = 0; centroidIndex < centroidsPoints.length; centroidIndex++) {
+            const newCentroidMesh = centroidMesh.clone()
+            newCentroidMesh.position.set(
+                centroidsPoints[centroidIndex].x,
+                centroidsPoints[centroidIndex].y,
+                0.05,
+            )
+            newCentroidMesh.updateMatrix()
+
+            ResourceTracker.trackResource({
+                id: `centroid${centroidIndex}`,
+                resource: newCentroidMesh,
+            })
+            Scene.add(newCentroidMesh)
+        }
+    }
+
     const updatePointer: TUpdatePointer = (state, event) => {
         state.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
         state.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
@@ -70,11 +163,13 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const intersects = state.raycaster.intersectObjects([board])
 
+        console.log(intersects)
+
         const destination = intersects.length > 0 && intersects[0].point
 
-        if (!destination) return
+        if (!destination || !state.player?.position) return
 
-        updatePlayerPosition(state, destination)
+        const playerPositionAtNavMesh = state.player.position.clone().setZ(0)
     }
 
     const InputsManager = createInputsManager({
@@ -88,6 +183,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const init = () => {
         initPlayer(state)
         CameraManager.init()
+        initPathfinding(state)
         InputsManager.init()
     }
 

@@ -1,3 +1,5 @@
+const isDev = import.meta.env.DEV
+
 import {
     IResourceTrackerState,
     TCreateResourceTracker,
@@ -12,7 +14,7 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const state: IResourceTrackerState = { Scene, resources: [] }
 
     const trackResource: TTrackResource = (resource) => {
-        console.log(`Resource of id: ${resource.id} is now tracked.`)
+        if (isDev) console.log(`Resource of id: ${resource.id} is now tracked.`)
 
         state.resources = [...state.resources, resource]
     }
@@ -23,12 +25,13 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const disposeTrackedResource: TDisposeTrackedResource = (id) => {
         const resource = state.resources.find((resource) => resource.id === id)?.resource
 
-        console.log(`Resource of id: ${id} was safely dispose.`)
+        if (isDev) console.log(`Resource of id: ${id} was safely dispose.`)
 
         if (!resource) {
-            console.warn(
-                `Resource of id: ${id} was not tracked and cannot be safely dispose. Check resource initialization.`,
-            )
+            if (isDev)
+                console.warn(
+                    `Resource of id: ${id} was not tracked and cannot be safely dispose. Check resource initialization.`,
+                )
 
             return
         }

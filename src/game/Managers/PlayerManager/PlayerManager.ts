@@ -73,13 +73,18 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const intersects = state.raycaster.intersectObjects([board])
 
-        console.log(intersects)
-
         const destination = intersects.length > 0 && intersects[0].point
 
         if (!destination || !state.player?.position) return
 
-        const playerPositionAtNavMesh = state.player.position.clone().setZ(0)
+        const startPosition = new Vector2(state.player.position.x, state.player.position.y)
+
+        const destinationPosition = new Vector2(destination.x, destination.y)
+
+        PathfindingManager.findPath({
+            startPosition,
+            destinationPosition,
+        })
     }
 
     const InputsManager = createInputsManager({

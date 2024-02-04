@@ -11,5 +11,5 @@ export type TCentroidsHelper = ({
     ResourceTracker: TResourceTracker
     polygons: Array<Vector2>
 }) => {
-    centroids: Array<Vector2>
+    centroids: Array<{ polygons: Array<Vector2>; center: Vector2 }>
 }

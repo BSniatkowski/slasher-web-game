@@ -8,14 +8,26 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
     const centroids = []
 
     for (let graphPolygonIndex = 0; graphPolygonIndex < polygons.length; graphPolygonIndex += 3) {
-        const centroid = new Vector2()
+        const centroidCenter = new Vector2()
 
-        centroid
+        centroidCenter
             .addVectors(polygons[graphPolygonIndex], polygons[graphPolygonIndex + 1])
             .add(polygons[graphPolygonIndex + 2])
             .multiplyScalar(1 / 3)
 
-        centroids.push(centroid)
+        const centroidPolygons = [
+            polygons[graphPolygonIndex],
+            polygons[graphPolygonIndex + 1],
+            polygons[graphPolygonIndex + 2],
+        ]
+
+        centroids.push({
+            polygons: centroidPolygons,
+            center: new Vector2(
+                Math.round(100 * centroidCenter.x) / 100,
+                Math.round(100 * centroidCenter.y) / 100,
+            ),
+        })
     }
 
     if (!isDev) return { centroids }
@@ -28,7 +40,11 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
 
     for (let centroidIndex = 0; centroidIndex < centroids.length; centroidIndex++) {
         const newCentroidMesh = centroidMesh.clone()
-        newCentroidMesh.position.set(centroids[centroidIndex].x, centroids[centroidIndex].y, 0.05)
+        newCentroidMesh.position.set(
+            centroids[centroidIndex].center.x,
+            centroids[centroidIndex].center.y,
+            0.05,
+        )
         newCentroidMesh.updateMatrix()
 
         ResourceTracker.trackResource({

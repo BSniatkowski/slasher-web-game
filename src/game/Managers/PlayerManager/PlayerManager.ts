@@ -79,6 +79,8 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const startPosition = new Vector2(state.player.position.x, state.player.position.y)
 
+        console.log(startPosition)
+
         const destinationPosition = new Vector2(destination.x, destination.y)
 
         PathfindingManager.findPath({

@@ -1,38 +1,26 @@
-import { Vector2 } from 'three'
+import { Vector2, Vector3 } from 'three'
 
 import { TCreateNodeChecker, TFindNodeByPosition } from './NodeChecker.types'
 
-const checkPointsDirections = ({
+const checkIfPointIsInsideTriangle = ({
     position,
     polygons,
 }: {
     position: Vector2
-    polygons: Array<Vector2>
-}) => ({
-    first: polygons[0].clone().sub(position),
-    second: polygons[1].clone().sub(position),
-    third: polygons[2].clone().sub(position),
-})
-
-const comparePositionToCenterDirectionsOfTriangle = ({
-    position,
-    center,
-    polygons,
-}: {
-    position: Vector2
-    center: Vector2
     polygons: Array<Vector2>
 }) => {
-    const directionsToCenter = checkPointsDirections({ position: center, polygons })
+    const positionIn3 = new Vector3(position.x, position.y, 0)
 
-    const directionsToPosition = checkPointsDirections({ position, polygons })
+    const pointA = new Vector3(polygons[0].x, polygons[0].y, 0).sub(positionIn3)
+    const pointB = new Vector3(polygons[1].x, polygons[1].y, 0).sub(positionIn3)
+    const pointC = new Vector3(polygons[2].x, polygons[2].y, 0).sub(positionIn3)
 
-    if (!directionsToCenter.first.roundToZero().equals(directionsToPosition.first.roundToZero()))
-        return false
-    if (!directionsToCenter.second.roundToZero().equals(directionsToPosition.second.roundToZero()))
-        return false
-    if (!directionsToCenter.third.roundToZero().equals(directionsToPosition.third.roundToZero()))
-        return false
+    const u = pointB.cross(pointC)
+    const v = pointC.cross(pointA)
+    const w = pointA.cross(pointB)
+
+    if (u.dot(v) < 0) return false
+    if (u.dot(w) < 0) return false
 
     return true
 }
@@ -40,11 +28,10 @@ const comparePositionToCenterDirectionsOfTriangle = ({
 export const createNodeChecker: TCreateNodeChecker = ({ graph }) => {
     const findNodeByPosition: TFindNodeByPosition = ({ position }) => {
         for (const graphNode of graph) {
-            const { id, center, polygons } = graphNode
+            const { id, polygons } = graphNode
 
-            const isInsideTriangle = comparePositionToCenterDirectionsOfTriangle({
+            const isInsideTriangle = checkIfPointIsInsideTriangle({
                 position,
-                center,
                 polygons,
             })
 

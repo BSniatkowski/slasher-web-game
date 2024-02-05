@@ -1,9 +1,13 @@
 import {
+    BufferGeometry,
     CylinderGeometry,
+    Line,
+    LineBasicMaterial,
     MathUtils,
     Mesh,
     MeshBasicMaterial,
     Raycaster,
+    TubeGeometry,
     Vector2,
     Vector3,
 } from 'three'
@@ -87,10 +91,18 @@ export const createPlayerManager: TCreatePlayerManager = ({
             .round()
             .divideScalar(100)
 
-        PathfindingManager.findPath({
+        const { path } = PathfindingManager.findPath({
             startPosition,
             destinationPosition,
         })
+
+        const path3D = path.map((point) => new Vector3(point.x, point.y, 0.25))
+
+        const geometry = new BufferGeometry().setFromPoints(path3D)
+        const material = new LineBasicMaterial({ color: 'red' })
+
+        const line = new Line(geometry, material)
+        Scene.add(line)
     }
 
     const InputsManager = createInputsManager({

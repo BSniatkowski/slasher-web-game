@@ -1,5 +1,6 @@
 import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
+import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
@@ -33,15 +34,30 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
     const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
         if (!state.NodeChecker) return { path: [] }
 
-        const startNode = state.NodeChecker.findNodeByPosition({ position: startPosition })
+        const { nodeId: startNodeId } = state.NodeChecker.findNodeByPosition({
+            position: startPosition,
+        })
 
-        const destinationNode = state.NodeChecker.findNodeByPosition({
+        const { nodeId: destinationNodeId } = state.NodeChecker.findNodeByPosition({
             position: destinationPosition,
         })
 
-        console.log(startNode, destinationNode)
+        if (!startNodeId || !destinationNodeId || !state.graph) {
+            console.warn(
+                'Something wnet wrong and pathfinding is not possible!',
+                startNodeId,
+                destinationNodeId,
+                state.graph,
+            )
 
-        return { path: [startPosition, destinationPosition] }
+            return { path: [startPosition, destinationPosition] }
+        }
+
+        console.time('traverse')
+        const { path } = GraphTraverse({ startNodeId, destinationNodeId, graph: state.graph })
+        console.timeEnd('traverse')
+
+        return { path }
     }
 
     return { init, findPath }

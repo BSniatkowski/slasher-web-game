@@ -28,19 +28,9 @@ export const GraphHelper: TGraphHelper = ({ centroids }) => {
             id: `${centroid.center.x}#${centroid.center.y}`,
             ...centroid,
             neighborNodesIds,
-            neighborNodes: [],
         }
 
         graph.push(node)
-    }
-
-    // Creation of recursive nodes with other nodes references itself as neighborNodes
-    for (const graphNode of graph) {
-        for (const neighborNodeId of graphNode.neighborNodesIds) {
-            const neighborNode = graph.find(({ id }) => id === neighborNodeId)
-
-            if (neighborNode) graphNode.neighborNodes.push(neighborNode)
-        }
     }
 
     return { graph }

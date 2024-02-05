@@ -5,7 +5,6 @@ export interface IGraphNode {
     center: Vector2
     polygons: Array<Vector2>
     neighborNodesIds: Array<string>
-    neighborNodes: TGraph
 }
 
 export type TGraph = Array<IGraphNode>

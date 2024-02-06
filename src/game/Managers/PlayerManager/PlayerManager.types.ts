@@ -1,5 +1,6 @@
 import {
     CylinderGeometry,
+    Line,
     Mesh,
     MeshBasicMaterial,
     PerspectiveCamera,
@@ -14,6 +15,7 @@ export interface IPlayerManagerState {
     player: null | Mesh<CylinderGeometry, MeshBasicMaterial>
     pointer: Vector2
     raycaster: Raycaster
+    pathMesh: null | Line
 }
 
 export type TUpdatePointer = (state: IPlayerManagerState, event: PointerEvent) => void

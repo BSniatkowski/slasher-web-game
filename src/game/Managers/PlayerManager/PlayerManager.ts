@@ -26,6 +26,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         player: null,
         pointer: new Vector2(),
         raycaster: new Raycaster(),
+        pathMesh: null,
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
@@ -67,6 +68,29 @@ export const createPlayerManager: TCreatePlayerManager = ({
         state.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
     }
 
+    const initPathVisialization = () => {
+        if (!state.player) return
+
+        const path3D = [state.player?.position.clone()]
+
+        const geometry = new BufferGeometry().setFromPoints(path3D)
+        const material = new LineBasicMaterial({ color: 'purple' })
+
+        const pathMesh = new Line(geometry, material)
+
+        ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
+
+        state.pathMesh = pathMesh
+
+        Scene.add(pathMesh)
+    }
+
+    const visualizePath = ({ path }: { path: Array<Vector2> }) => {
+        const path3D = path.map((point) => new Vector3(point.x, point.y, 0.1))
+
+        if (state.pathMesh) state.pathMesh.geometry.setFromPoints(path3D)
+    }
+
     const goToPosition = (state: IPlayerManagerState) => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
@@ -95,13 +119,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
             destinationPosition,
         })
 
-        const path3D = path.map((point) => new Vector3(point.x, point.y, 0.25))
-
-        const geometry = new BufferGeometry().setFromPoints(path3D)
-        const material = new LineBasicMaterial({ color: 'red' })
-
-        const line = new Line(geometry, material)
-        Scene.add(line)
+        if (path) visualizePath({ path })
     }
 
     const InputsManager = createInputsManager({
@@ -116,6 +134,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         initPlayer(state)
         CameraManager.init()
         PathfindingManager.init()
+        initPathVisialization()
         InputsManager.init()
     }
 

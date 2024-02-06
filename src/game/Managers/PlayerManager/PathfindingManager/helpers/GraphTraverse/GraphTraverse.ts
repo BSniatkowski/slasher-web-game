@@ -43,6 +43,11 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
     const sortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
 
     const traverseThroughNodes = (node: IGraphNodeCopy) => {
+        if (node.distance === 0) return node
+
+        if (node.neighborNodes.filter(({ stepped }) => !stepped).length === 0 && node.previousNode)
+            return traverseThroughNodes(node.previousNode)
+
         node.neighborNodes.sort(sortFunc)
 
         for (const neighborNode of node.neighborNodes) {
@@ -50,8 +55,6 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
             neighborNode.stepped = true
             neighborNode.previousNode = node
-
-            if (neighborNode.distance === 0) return neighborNode
 
             return traverseThroughNodes(neighborNode)
         }

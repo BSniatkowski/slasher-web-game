@@ -1,8 +1,8 @@
-import { Mesh, Scene } from 'three'
+import { Line, Mesh, Scene } from 'three'
 
 export interface ITrackedResource {
     id: string
-    resource: Mesh
+    resource: Mesh | Line
 }
 
 export interface IResourceTrackerState {

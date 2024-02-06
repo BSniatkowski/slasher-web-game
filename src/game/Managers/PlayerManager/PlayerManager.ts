@@ -7,7 +7,6 @@ import {
     Mesh,
     MeshBasicMaterial,
     Raycaster,
-    TubeGeometry,
     Vector2,
     Vector3,
 } from 'three'
@@ -75,7 +74,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         if (!board) return
 
-        const intersects = state.raycaster.intersectObjects([board])
+        const intersects = state.raycaster.intersectObjects([board], false)
 
         const destination = intersects.length > 0 && intersects[0].point
 

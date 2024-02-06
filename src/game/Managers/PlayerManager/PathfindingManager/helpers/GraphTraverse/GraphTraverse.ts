@@ -72,7 +72,5 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     getPathFromDestinationNode(destinationNodeWithPath)
 
-    console.log(path)
-
     return { path }
 }

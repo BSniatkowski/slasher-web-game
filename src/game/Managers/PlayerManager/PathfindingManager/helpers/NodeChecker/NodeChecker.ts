@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from 'three'
+import { Vector2 } from 'three'
 
 import { TCreateNodeChecker, TFindNodeByPosition } from './NodeChecker.types'
 
@@ -9,20 +9,18 @@ const checkIfPointIsInsideTriangle = ({
     position: Vector2
     polygons: Array<Vector2>
 }) => {
-    const positionIn3 = new Vector3(position.x, position.y, 0)
+    const p1 = polygons[0]
+    const p2 = polygons[1]
+    const p3 = polygons[2]
 
-    const pointA = new Vector3(polygons[0].x, polygons[0].y, 0).sub(positionIn3)
-    const pointB = new Vector3(polygons[1].x, polygons[1].y, 0).sub(positionIn3)
-    const pointC = new Vector3(polygons[2].x, polygons[2].y, 0).sub(positionIn3)
+    const denominator = (p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y)
+    const a =
+        ((p2.y - p3.y) * (position.x - p3.x) + (p3.x - p2.x) * (position.y - p3.y)) / denominator
+    const b =
+        ((p3.y - p1.y) * (position.x - p3.x) + (p1.x - p3.x) * (position.y - p3.y)) / denominator
+    const c = 1 - a - b
 
-    const u = pointB.cross(pointC)
-    const v = pointC.cross(pointA)
-    const w = pointA.cross(pointB)
-
-    if (u.dot(v) < 0) return false
-    if (u.dot(w) < 0) return false
-
-    return true
+    return 0 <= a && a <= 1 && 0 <= b && b <= 1 && 0 <= c && c <= 1
 }
 
 export const createNodeChecker: TCreateNodeChecker = ({ graph }) => {

@@ -4,8 +4,8 @@ import { createBoardModel } from './helpers/createBoardModel/createBoardModel'
 import { Walker } from './helpers/Walker/Walker'
 
 const maxSize = {
-    x: 200,
-    y: 200,
+    x: 100,
+    y: 100,
 }
 
 export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker }) => {
@@ -24,6 +24,8 @@ export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker
         state.board = walkableBoard
 
         const boardModel = createBoardModel({ board: walkableBoard })
+        boardModel.matrixAutoUpdate = false
+        boardModel.updateMatrix()
 
         state.boardModel = boardModel
 

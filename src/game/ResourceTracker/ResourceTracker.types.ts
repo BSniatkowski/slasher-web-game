@@ -1,8 +1,8 @@
-import { Mesh, Scene } from 'three'
+import { Line, Mesh, Scene } from 'three'
 
 export interface ITrackedResource {
     id: string
-    resource: Mesh
+    resource: Mesh | Line
 }
 
 export interface IResourceTrackerState {
@@ -12,6 +12,8 @@ export interface IResourceTrackerState {
 
 export type TTrackResource = (resource: ITrackedResource) => void
 
+export type TGetTrackedResource = (id: string) => Mesh | undefined
+
 export type TDisposeTrackedResource = (id: string) => void
 
 export type TDisposeMultipleTrackedResources = (similiarIdPart: string) => void
@@ -20,6 +22,7 @@ export type TDisposeAllResources = () => void
 
 export type TCreateResourceTracker = (Scene: Scene) => {
     trackResource: TTrackResource
+    getTrackedResource: TGetTrackedResource
     disposeTrackedResource: TDisposeTrackedResource
     disposeMultipleTrackedResources: TDisposeMultipleTrackedResources
     disposeAllResources: TDisposeAllResources

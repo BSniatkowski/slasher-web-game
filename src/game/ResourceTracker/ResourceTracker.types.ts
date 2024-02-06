@@ -12,7 +12,7 @@ export interface IResourceTrackerState {
 
 export type TTrackResource = (resource: ITrackedResource) => void
 
-export type TGetTrackedResource = (id: string) => Mesh | undefined
+export type TGetTrackedResource = (id: string) => Mesh | Line | undefined
 
 export type TDisposeTrackedResource = (id: string) => void
 

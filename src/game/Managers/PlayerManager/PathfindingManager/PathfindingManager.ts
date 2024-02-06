@@ -1,3 +1,5 @@
+import { Mesh } from 'three'
+
 import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
 import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
@@ -16,7 +18,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
     }
 
     const init = () => {
-        const board = ResourceTracker.getTrackedResource('board')
+        const board = ResourceTracker.getTrackedResource('board') as Mesh
 
         if (!board) return
 

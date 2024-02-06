@@ -1,6 +1,6 @@
 import { Vector2 } from 'three'
 
-import { IGraphNodeCopy, TGraphCopy, TGraphTraverse } from './GraphTraverse.types'
+import { IGraphNodeCopy, TGraphCopy, TGraphTraverse, TSortFunc } from './GraphTraverse.types'
 
 export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, graph }) => {
     const originalStartNode = graph.find(({ id }) => id === startNodeId)
@@ -40,8 +40,9 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         }
     }
 
-    const sortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
+    const sortFunc: TSortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
 
+    // @ts-expect-error Traverse works perfect. Maybe just a function expression need some corrections to typesript check it correctly
     const traverseThroughNodes = (node: IGraphNodeCopy) => {
         if (node.distance === 0) return node
 

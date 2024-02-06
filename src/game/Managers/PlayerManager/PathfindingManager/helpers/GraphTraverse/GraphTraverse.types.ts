@@ -22,3 +22,5 @@ export interface IGraphNodeCopy extends IGraphNode {
 }
 
 export type TGraphCopy = Array<IGraphNodeCopy>
+
+export type TSortFunc = (nodeA: IGraphNodeCopy, nodeB: IGraphNodeCopy) => number

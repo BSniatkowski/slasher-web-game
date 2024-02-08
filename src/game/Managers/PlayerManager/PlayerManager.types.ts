@@ -16,6 +16,7 @@ export interface IPlayerManagerState {
     pointer: Vector2
     raycaster: Raycaster
     pathMesh: null | Line
+    shorterPathMesh: null | Line
 }
 
 export type TUpdatePointer = (state: IPlayerManagerState, event: PointerEvent) => void

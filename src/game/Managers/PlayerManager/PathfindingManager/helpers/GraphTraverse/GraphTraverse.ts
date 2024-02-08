@@ -1,6 +1,21 @@
-import { Vector2 } from 'three'
-
 import { IGraphNodeCopy, TGraphCopy, TGraphTraverse, TSortFunc } from './GraphTraverse.types'
+
+// @ts-expect-error Traverse works. Maybe just a function expression need some corrections for typescript to check it correctly
+const checkIfHasSameNodeDownPreviousNodes = (
+    node: IGraphNodeCopy,
+    directNeighborNodes: Array<IGraphNodeCopy> = [],
+) => {
+    for (const neighborNode of directNeighborNodes) {
+        if (node.id === neighborNode.id) {
+            return node
+        }
+    }
+
+    if (node.previousNode)
+        return checkIfHasSameNodeDownPreviousNodes(node.previousNode, directNeighborNodes)
+
+    return false
+}
 
 export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, graph }) => {
     const originalStartNode = graph.find(({ id }) => id === startNodeId)
@@ -42,7 +57,7 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     const sortFunc: TSortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
 
-    // @ts-expect-error Traverse works perfect. Maybe just a function expression need some corrections to typesript check it correctly
+    // @ts-expect-error Traverse works. Maybe just a function expression need some corrections for typescript to check it correctly
     const traverseThroughNodes = (node: IGraphNodeCopy) => {
         if (node.distance === 0) return node
 
@@ -65,16 +80,38 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     if (!destinationNodeWithPath) return { path: [] }
 
-    const path: Array<Vector2> = []
+    const getPathFromDestinationNode = (
+        nodeWithPath: IGraphNodeCopy,
+        path: Array<IGraphNodeCopy> = [],
+    ) => {
+        if (nodeWithPath.previousNode) {
+            path.push(nodeWithPath)
+            return getPathFromDestinationNode(nodeWithPath.previousNode, path)
+        }
 
-    const getPathFromDestinationNode = (destinationNodeWithPath: IGraphNodeCopy) => {
-        if (destinationNodeWithPath.previousNode) {
-            path.push(destinationNodeWithPath.center)
-            getPathFromDestinationNode(destinationNodeWithPath.previousNode)
+        return path
+    }
+
+    const path = getPathFromDestinationNode(destinationNodeWithPath)
+
+    for (const node of path) {
+        const shortageNode = checkIfHasSameNodeDownPreviousNodes(
+            node,
+            node.neighborNodes.filter(({ id }) => id !== node.previousNode.id),
+        )
+
+        if (shortageNode) {
+            console.log(`has shortage from ${node.id} to ${shortageNode.id}`)
+            node.previousNode = shortageNode
         }
     }
 
-    getPathFromDestinationNode(destinationNodeWithPath)
+    const shorterPath = getPathFromDestinationNode(destinationNodeWithPath)
 
-    return { path }
+    console.log(path.length, shorterPath.length)
+
+    return {
+        path: path.map(({ center }) => center),
+        shorterPath: shorterPath.map(({ center }) => center),
+    }
 }

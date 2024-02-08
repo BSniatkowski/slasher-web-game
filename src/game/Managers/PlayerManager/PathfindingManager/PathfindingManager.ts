@@ -55,9 +55,9 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
             return { path: [startPosition, destinationPosition] }
         }
 
-        const { path, shorterPath } = GraphTraverse({ startNodeId, destinationNodeId, graph: state.graph })
+        const { path } = GraphTraverse({ startNodeId, destinationNodeId, graph: state.graph })
 
-        return { path, shorterPath }
+        return { path }
     }
 
     return { init, findPath }

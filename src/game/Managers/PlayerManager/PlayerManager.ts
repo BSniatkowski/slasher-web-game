@@ -27,7 +27,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
         pointer: new Vector2(),
         raycaster: new Raycaster(),
         pathMesh: null,
-        shorterPathMesh: null,
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
@@ -76,31 +75,20 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const geometry = new BufferGeometry().setFromPoints(path3D)
         const material = new LineBasicMaterial({ color: 'purple' })
-        const materialShorter = new LineBasicMaterial({ color: 'green' })
 
         const pathMesh = new Line(geometry, material)
-        const shorterPathMesh = new Line(geometry.clone(), materialShorter)
 
         ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
-        ResourceTracker.trackResource({ id: 'shorterPath', resource: shorterPathMesh })
 
         state.pathMesh = pathMesh
-        state.shorterPathMesh = shorterPathMesh
 
         Scene.add(pathMesh)
-        Scene.add(shorterPathMesh)
     }
 
     const visualizePath = ({ path }: { path: Array<Vector2> }) => {
         const path3D = path.map((point) => new Vector3(point.x, point.y, 0.1))
 
         if (state.pathMesh) state.pathMesh.geometry.setFromPoints(path3D)
-    }
-
-    const visualizeShorterPath = ({ shorterPath }: { shorterPath: Array<Vector2> }) => {
-        const path3D = shorterPath.map((point) => new Vector3(point.x, point.y, 0.1))
-
-        if (state.shorterPathMesh) state.shorterPathMesh.geometry.setFromPoints(path3D)
     }
 
     const goToPosition = (state: IPlayerManagerState) => {
@@ -126,13 +114,12 @@ export const createPlayerManager: TCreatePlayerManager = ({
             .round()
             .divideScalar(100)
 
-        const { path, shorterPath } = PathfindingManager.findPath({
+        const { path } = PathfindingManager.findPath({
             startPosition,
             destinationPosition,
         })
 
         if (path) visualizePath({ path })
-        if (shorterPath) visualizeShorterPath({ shorterPath })
     }
 
     const InputsManager = createInputsManager({

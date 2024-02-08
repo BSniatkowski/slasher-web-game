@@ -92,26 +92,20 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         return path
     }
 
-    const path = getPathFromDestinationNode(destinationNodeWithPath)
+    const notOptimizedPath = getPathFromDestinationNode(destinationNodeWithPath)
 
-    for (const node of path) {
+    for (const node of notOptimizedPath) {
         const shortageNode = checkIfHasSameNodeDownPreviousNodes(
             node,
             node.neighborNodes.filter(({ id }) => id !== node.previousNode.id),
         )
 
-        if (shortageNode) {
-            console.log(`has shortage from ${node.id} to ${shortageNode.id}`)
-            node.previousNode = shortageNode
-        }
+        if (shortageNode) node.previousNode = shortageNode
     }
 
-    const shorterPath = getPathFromDestinationNode(destinationNodeWithPath)
-
-    console.log(path.length, shorterPath.length)
+    const path = getPathFromDestinationNode(destinationNodeWithPath).map(({ center }) => center)
 
     return {
-        path: path.map(({ center }) => center),
-        shorterPath: shorterPath.map(({ center }) => center),
+        path,
     }
 }

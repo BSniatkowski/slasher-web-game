@@ -1,4 +1,5 @@
 const isDev = import.meta.env.DEV
+const allLogs = import.meta.env.SHOW_RESOURCES_TRACKER_INFO_LOGS as boolean
 
 import {
     IResourceTrackerState,
@@ -14,7 +15,7 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const state: IResourceTrackerState = { Scene, resources: [] }
 
     const trackResource: TTrackResource = (resource) => {
-        if (isDev) console.log(`Resource of id: ${resource.id} is now tracked.`)
+        if (isDev && allLogs) console.log(`Resource of id: ${resource.id} is now tracked.`)
 
         state.resources = [...state.resources, resource]
     }
@@ -25,7 +26,7 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const disposeTrackedResource: TDisposeTrackedResource = (id) => {
         const resource = state.resources.find((resource) => resource.id === id)?.resource
 
-        if (isDev) console.log(`Resource of id: ${id} was safely dispose.`)
+        if (isDev && allLogs) console.log(`Resource of id: ${id} was safely dispose.`)
 
         if (!resource) {
             if (isDev)

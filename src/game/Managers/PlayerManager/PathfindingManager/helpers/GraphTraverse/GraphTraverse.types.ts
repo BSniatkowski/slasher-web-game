@@ -23,4 +23,16 @@ export interface IGraphNodeCopy extends IGraphNode {
 
 export type TGraphCopy = Array<IGraphNodeCopy>
 
+export type TCheckIfHasSameNodeDownPreviousNodes = (
+    node: IGraphNodeCopy,
+    directNeighborNodes: Array<IGraphNodeCopy>,
+) => IGraphNodeCopy | false
+
+export type TTraverseThroughNodes = (node: IGraphNodeCopy) => IGraphNodeCopy | undefined
+
 export type TSortFunc = (nodeA: IGraphNodeCopy, nodeB: IGraphNodeCopy) => number
+
+export type TGetPathFromDestinationNode = (
+    nodeWithPath: IGraphNodeCopy,
+    path?: Array<IGraphNodeCopy>,
+) => Array<IGraphNodeCopy>

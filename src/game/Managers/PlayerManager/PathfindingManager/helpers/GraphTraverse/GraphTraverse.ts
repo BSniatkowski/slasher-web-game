@@ -1,6 +1,28 @@
-import { Vector2 } from 'three'
+import {
+    IGraphNodeCopy,
+    TCheckIfHasSameNodeDownPreviousNodes,
+    TGetPathFromDestinationNode,
+    TGraphCopy,
+    TGraphTraverse,
+    TSortFunc,
+    TTraverseThroughNodes,
+} from './GraphTraverse.types'
 
-import { IGraphNodeCopy, TGraphCopy, TGraphTraverse, TSortFunc } from './GraphTraverse.types'
+const checkIfHasSameNodeDownPreviousNodes: TCheckIfHasSameNodeDownPreviousNodes = (
+    node: IGraphNodeCopy,
+    directNeighborNodes: Array<IGraphNodeCopy> = [],
+) => {
+    for (const neighborNode of directNeighborNodes) {
+        if (node.id === neighborNode.id) {
+            return node
+        }
+    }
+
+    if (node.previousNode)
+        return checkIfHasSameNodeDownPreviousNodes(node.previousNode, directNeighborNodes)
+
+    return false
+}
 
 export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, graph }) => {
     const originalStartNode = graph.find(({ id }) => id === startNodeId)
@@ -42,8 +64,7 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     const sortFunc: TSortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
 
-    // @ts-expect-error Traverse works perfect. Maybe just a function expression need some corrections to typesript check it correctly
-    const traverseThroughNodes = (node: IGraphNodeCopy) => {
+    const traverseThroughNodes: TTraverseThroughNodes = (node) => {
         if (node.distance === 0) return node
 
         if (node.neighborNodes.filter(({ stepped }) => !stepped).length === 0 && node.previousNode)
@@ -61,20 +82,33 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         }
     }
 
-    const destinationNodeWithPath = traverseThroughNodes(startNode)
+    const destinationNodeWithPath = traverseThroughNodes(startNode) as IGraphNodeCopy | undefined
 
     if (!destinationNodeWithPath) return { path: [] }
 
-    const path: Array<Vector2> = []
-
-    const getPathFromDestinationNode = (destinationNodeWithPath: IGraphNodeCopy) => {
-        if (destinationNodeWithPath.previousNode) {
-            path.push(destinationNodeWithPath.center)
-            getPathFromDestinationNode(destinationNodeWithPath.previousNode)
+    const getPathFromDestinationNode: TGetPathFromDestinationNode = (nodeWithPath, path = []) => {
+        if (nodeWithPath.previousNode) {
+            path.push(nodeWithPath)
+            return getPathFromDestinationNode(nodeWithPath.previousNode, path)
         }
+
+        return path
     }
 
-    getPathFromDestinationNode(destinationNodeWithPath)
+    const notOptimizedPath = getPathFromDestinationNode(destinationNodeWithPath)
 
-    return { path }
+    for (const node of notOptimizedPath) {
+        const shortageNode = checkIfHasSameNodeDownPreviousNodes(
+            node,
+            node.neighborNodes.filter(({ id }) => id !== node.previousNode?.id),
+        ) as IGraphNodeCopy
+
+        if (shortageNode) node.previousNode = shortageNode
+    }
+
+    const path = getPathFromDestinationNode(destinationNodeWithPath).map(({ center }) => center)
+
+    return {
+        path,
+    }
 }

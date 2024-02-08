@@ -1,7 +1,14 @@
-import { IGraphNodeCopy, TGraphCopy, TGraphTraverse, TSortFunc } from './GraphTraverse.types'
+import {
+    IGraphNodeCopy,
+    TCheckIfHasSameNodeDownPreviousNodes,
+    TGetPathFromDestinationNode,
+    TGraphCopy,
+    TGraphTraverse,
+    TSortFunc,
+    TTraverseThroughNodes,
+} from './GraphTraverse.types'
 
-// @ts-expect-error Traverse works. Maybe just a function expression need some corrections for typescript to check it correctly
-const checkIfHasSameNodeDownPreviousNodes = (
+const checkIfHasSameNodeDownPreviousNodes: TCheckIfHasSameNodeDownPreviousNodes = (
     node: IGraphNodeCopy,
     directNeighborNodes: Array<IGraphNodeCopy> = [],
 ) => {
@@ -57,8 +64,7 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     const sortFunc: TSortFunc = ({ distance: dA }, { distance: dB }) => dA - dB
 
-    // @ts-expect-error Traverse works. Maybe just a function expression need some corrections for typescript to check it correctly
-    const traverseThroughNodes = (node: IGraphNodeCopy) => {
+    const traverseThroughNodes: TTraverseThroughNodes = (node) => {
         if (node.distance === 0) return node
 
         if (node.neighborNodes.filter(({ stepped }) => !stepped).length === 0 && node.previousNode)
@@ -76,14 +82,11 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         }
     }
 
-    const destinationNodeWithPath = traverseThroughNodes(startNode)
+    const destinationNodeWithPath = traverseThroughNodes(startNode) as IGraphNodeCopy | undefined
 
     if (!destinationNodeWithPath) return { path: [] }
 
-    const getPathFromDestinationNode = (
-        nodeWithPath: IGraphNodeCopy,
-        path: Array<IGraphNodeCopy> = [],
-    ) => {
+    const getPathFromDestinationNode: TGetPathFromDestinationNode = (nodeWithPath, path = []) => {
         if (nodeWithPath.previousNode) {
             path.push(nodeWithPath)
             return getPathFromDestinationNode(nodeWithPath.previousNode, path)
@@ -97,8 +100,8 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
     for (const node of notOptimizedPath) {
         const shortageNode = checkIfHasSameNodeDownPreviousNodes(
             node,
-            node.neighborNodes.filter(({ id }) => id !== node.previousNode.id),
-        )
+            node.neighborNodes.filter(({ id }) => id !== node.previousNode?.id),
+        ) as IGraphNodeCopy
 
         if (shortageNode) node.previousNode = shortageNode
     }

@@ -106,7 +106,9 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         if (shortageNode) node.previousNode = shortageNode
     }
 
-    const path = getPathFromDestinationNode(destinationNodeWithPath).map(({ center }) => center)
+    const path = getPathFromDestinationNode(destinationNodeWithPath)
+        .map(({ center }) => center)
+        .reverse()
 
     return {
         path,

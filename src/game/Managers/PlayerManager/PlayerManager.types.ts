@@ -10,6 +10,7 @@ import {
 } from 'three'
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
+import { TAnimationManager } from '../AnimationsManager/AnimationsManager.types'
 
 export interface IPlayerManagerState {
     player: null | Mesh<CylinderGeometry, MeshBasicMaterial>
@@ -18,18 +19,20 @@ export interface IPlayerManagerState {
     pathMesh: null | Line
 }
 
-export type TUpdatePointer = (state: IPlayerManagerState, event: PointerEvent) => void
+export type TUpdatePointer = (event: PointerEvent) => void
 
 export type TCreatePlayerManager = ({
     ref,
     Scene,
     Camera,
     ResourceTracker,
+    AnimationManager,
 }: {
     ref: HTMLCanvasElement
     Scene: Scene
     Camera: PerspectiveCamera
     ResourceTracker: TResourceTracker
+    AnimationManager: TAnimationManager
 }) => {
     init: () => void
     dispose: () => void

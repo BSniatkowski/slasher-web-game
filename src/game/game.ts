@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from 'three'
 
 import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
+import { createAnimationManager } from './Managers/AnimationsManager/AnimationsManager'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
 import { createPlayerManager } from './Managers/PlayerManager/PlayerManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
@@ -17,6 +18,8 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const ResourceTracker = createResourceTracker(Scene)
 
+    const AnimationManager = createAnimationManager()
+
     const ArenaManager = createArenaManager({ Scene, ResourceTracker })
 
     const PlayerManager = createPlayerManager({
@@ -24,6 +27,7 @@ export const initializeGame: TInitializeGame = (ref) => {
         Scene,
         Camera,
         ResourceTracker,
+        AnimationManager,
     })
 
     const generalState = {
@@ -41,8 +45,10 @@ export const initializeGame: TInitializeGame = (ref) => {
     const animate: TAnimate = () => {
         if (generalState.isPaused) return
 
-        requestAnimationFrame(animate)
+        AnimationManager.animate()
         Renderer.render(Scene, Camera)
+
+        requestAnimationFrame(animate)
     }
 
     const pause: TPause = () => {

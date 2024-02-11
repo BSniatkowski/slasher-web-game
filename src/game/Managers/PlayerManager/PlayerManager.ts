@@ -140,11 +140,14 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         if (path.length === 0) return
 
-        const positionGetter = () => state.player?.position ?? new Vector3()
+        const positionGetter = () => state.player?.position.clone().setZ(0) ?? new Vector3()
         const isPossibleGetter = () => true // TODO - update with introducing movement emparing logic
         const isEndedGetter = () =>
             state.player
-                ? state.player.position.distanceToSquared(path[path.length - 1]) < 0.1
+                ? state.player.position
+                      .clone()
+                      .setZ(0)
+                      .distanceToSquared(path[path.length - 1]) === 0
                 : true
 
         AnimationManager.addAnimation({
@@ -152,7 +155,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
             type: EAnimationTypes.dynamic,
             callback: createMoveAlongPathAnimation({
                 path,
-                speed: 0.01,
+                speed: 0.005,
                 positionGetter,
                 positionUpdate: updatePlayerPosition,
             }),

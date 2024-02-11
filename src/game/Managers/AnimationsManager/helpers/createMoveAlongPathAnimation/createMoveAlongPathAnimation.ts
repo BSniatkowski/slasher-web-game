@@ -18,19 +18,32 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
         pathCopy,
         actualPointIndex: 0,
         vectorLerpPerTick: 0,
+        additonalLerpSpeed: 0,
     }
 
     const calculateVectorLerpPerTick = () => {
         const position = positionGetter()
 
-        if (position)
-            return speed / position.distanceToSquared(state.pathCopy[state.actualPointIndex])
+        if (!position) return
+
+        const distance = position.distanceToSquared(state.pathCopy[state.actualPointIndex])
+
+        const currentSpeed = speed + state.additonalLerpSpeed
+
+        if (distance < currentSpeed) {
+            state.additonalLerpSpeed += speed - distance
+            return 1
+        }
+
+        state.additonalLerpSpeed = 0
+
+        return currentSpeed / distance
     }
 
     const checkIfPointIsAchieved = (point: Vector3) => {
         const position = positionGetter()
 
-        if (position) return position.distanceToSquared(point) <= 0.1
+        if (position) return position.distanceToSquared(point) === 0
     }
 
     const callback = () => {

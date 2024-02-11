@@ -108,9 +108,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const visualizePath = ({ path }: { path: Array<Vector3> }) => {
         if (!state.pathMesh) return
 
-        const path3D = path.map((point) => new Vector3(point.x, point.y))
-
-        state.pathMesh.geometry.setFromPoints(path3D)
+        state.pathMesh.geometry.setFromPoints(path)
         state.pathMesh.updateMatrix()
     }
 

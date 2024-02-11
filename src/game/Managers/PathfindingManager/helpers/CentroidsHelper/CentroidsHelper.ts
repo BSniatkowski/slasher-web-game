@@ -1,4 +1,4 @@
-import { CircleGeometry, Mesh, MeshBasicMaterial, Vector3 } from 'three'
+import { CircleGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three'
 
 import { TCentroidsHelper } from './CentroidsHelper.types'
 
@@ -8,7 +8,7 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
     const centroids = []
 
     for (let graphPolygonIndex = 0; graphPolygonIndex < polygons.length; graphPolygonIndex += 3) {
-        const centroidCenter = new Vector3()
+        const centroidCenter = new Vector2()
 
         centroidCenter
             .addVectors(polygons[graphPolygonIndex], polygons[graphPolygonIndex + 1])
@@ -46,7 +46,11 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
 
     for (let centroidIndex = 0; centroidIndex < centroids.length; centroidIndex++) {
         const newCentroidMesh = centroidMesh.clone()
-        newCentroidMesh.position.copy(centroids[centroidIndex].center)
+        newCentroidMesh.position.set(
+            centroids[centroidIndex].center.x,
+            centroids[centroidIndex].center.y,
+            0,
+        )
         newCentroidMesh.updateMatrix()
 
         ResourceTracker.trackResource({

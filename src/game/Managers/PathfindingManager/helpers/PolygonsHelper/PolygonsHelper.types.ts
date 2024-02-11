@@ -1,6 +1,6 @@
-import { BufferGeometry, Material, Mesh, NormalBufferAttributes, Scene, Vector3 } from 'three'
+import { BufferGeometry, Material, Mesh, NormalBufferAttributes, Scene, Vector2 } from 'three'
 
-import { TResourceTracker } from '../../../../../ResourceTracker/ResourceTracker.types'
+import { TResourceTracker } from '../../../../ResourceTracker/ResourceTracker.types'
 
 export type TPolygonsHelper = ({
     Scene,
@@ -11,5 +11,5 @@ export type TPolygonsHelper = ({
     ResourceTracker: TResourceTracker
     board: Mesh<BufferGeometry<NormalBufferAttributes>, Material | Material[]>
 }) => {
-    polygons: Array<Vector3>
+    polygons: Array<Vector2>
 }

@@ -1,3 +1,5 @@
+import { Vector3 } from 'three'
+
 import {
     IGraphNodeCopy,
     TCheckIfHasSameNodeDownPreviousNodes,
@@ -106,9 +108,15 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         if (shortageNode) node.previousNode = shortageNode
     }
 
-    const path = getPathFromDestinationNode(destinationNodeWithPath)
-        .map(({ center }) => center)
-        .reverse()
+    const path2D = getPathFromDestinationNode(destinationNodeWithPath)
+
+    const path = []
+
+    for (const node of path2D) {
+        path.push(new Vector3(node.center.x, node.center.y))
+    }
+
+    path.reverse()
 
     return {
         path,

@@ -1,6 +1,6 @@
 import { Scene, Vector3 } from 'three'
 
-import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
+import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TGraph } from './helpers/GraphHelper/GraphHelper.types'
 import { TNodeChecker } from './helpers/NodeChecker/NodeChecker.types'
 

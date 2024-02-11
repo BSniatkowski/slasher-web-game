@@ -44,14 +44,23 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
     const updatePlayerPosition = (destination: Vector3) => {
         state.player?.position.copy(destination).setZ(0.25)
+        state.player?.updateMatrix()
         CameraManager.lookCameraAtPlayer()
     }
 
     const initPlayer = () => {
-        const geometry = new CylinderGeometry(0.25, 0.25, 0.5)
-        const material = new MeshBasicMaterial({ color: 'green' })
+        const geometry = new CylinderGeometry(0.25, 0.25, 0.5, 16)
+        const material = new MeshBasicMaterial({
+            color: 'green',
+            depthTest: false,
+            depthWrite: false,
+            transparent: true,
+        })
 
         const playerMesh = new Mesh(geometry, material)
+        playerMesh.matrixAutoUpdate = false
+        playerMesh.renderOrder = 3
+
         playerMesh.rotateX(MathUtils.degToRad(90))
 
         ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
@@ -82,9 +91,12 @@ export const createPlayerManager: TCreatePlayerManager = ({
             color: 'purple',
             depthTest: false,
             depthWrite: false,
+            transparent: true,
         })
 
         const pathMesh = new Line(geometry, material)
+        pathMesh.matrixAutoUpdate = false
+        pathMesh.renderOrder = 2
 
         ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
 
@@ -94,9 +106,12 @@ export const createPlayerManager: TCreatePlayerManager = ({
     }
 
     const visualizePath = ({ path }: { path: Array<Vector3> }) => {
+        if (!state.pathMesh) return
+
         const path3D = path.map((point) => new Vector3(point.x, point.y))
 
-        if (state.pathMesh) state.pathMesh.geometry.setFromPoints(path3D)
+        state.pathMesh.geometry.setFromPoints(path3D)
+        state.pathMesh.updateMatrix()
     }
 
     const goToPosition = () => {

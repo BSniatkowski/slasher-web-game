@@ -10,12 +10,14 @@ export const GraphHelper: TGraphHelper = ({ centroids }) => {
         for (const potentialNeighborCentroid of centroids) {
             const { center: pNcenter, polygons: pNPolygons } = potentialNeighborCentroid
 
-            if (pNcenter.x === center.x && pNcenter.y === center.y) continue
+            if (pNcenter.x === center.x && pNcenter.y === centroid.center.y) continue
 
             const sharedPolygons = []
 
             for (const polygon of polygons) {
                 for (const pNPolygon of pNPolygons) {
+                    if (sharedPolygons.length >= 2) continue
+
                     if (pNPolygon.x === polygon.x && pNPolygon.y === polygon.y)
                         sharedPolygons.push(pNPolygons)
                 }

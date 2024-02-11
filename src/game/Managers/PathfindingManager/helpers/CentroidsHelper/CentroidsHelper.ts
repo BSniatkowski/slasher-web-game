@@ -37,7 +37,6 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
         color: 'red',
         depthTest: false,
         depthWrite: false,
-        transparent: true,
     })
 
     const centroidMesh = new Mesh(centroidGeometry, centroidMaterial)
@@ -46,6 +45,7 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
 
     for (let centroidIndex = 0; centroidIndex < centroids.length; centroidIndex++) {
         const newCentroidMesh = centroidMesh.clone()
+
         newCentroidMesh.position.set(
             centroids[centroidIndex].center.x,
             centroids[centroidIndex].center.y,

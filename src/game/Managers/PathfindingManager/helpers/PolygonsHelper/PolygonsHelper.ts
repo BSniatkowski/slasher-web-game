@@ -20,7 +20,6 @@ export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board 
         color: 'blue',
         depthTest: false,
         depthWrite: false,
-        transparent: true,
     })
 
     const polygonMesh = new Mesh(polygonGeometry, polygonMaterial)

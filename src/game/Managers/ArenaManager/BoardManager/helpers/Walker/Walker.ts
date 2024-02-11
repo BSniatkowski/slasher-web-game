@@ -16,10 +16,37 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
             vacantPositions.push(vacantPosition)
     }
 
-    if (state.board?.[x - 1]?.[y] === false) vacantPositions.push({ x, y })
-    if (state.board?.[x]?.[y - 1] === false) vacantPositions.push({ x, y })
-    if (state.board?.[x + 1]?.[y] === false) vacantPositions.push({ x, y })
-    if (state.board?.[x]?.[y - 1] === false) vacantPositions.push({ x, y })
+    if (
+        state.board?.[x - 1]?.[y] === false &&
+        !vacantPositions.find(
+            (vacantPosition) => vacantPosition.x === x - 1 && vacantPosition.y === y,
+        )
+    )
+        vacantPositions.push({ x: x - 1, y })
+
+    if (
+        state.board?.[x]?.[y - 1] === false &&
+        !vacantPositions.find(
+            (vacantPosition) => vacantPosition.x === x && vacantPosition.y === y - 1,
+        )
+    )
+        vacantPositions.push({ x, y: y - 1 })
+
+    if (
+        state.board?.[x + 1]?.[y] === false &&
+        !vacantPositions.find(
+            (vacantPosition) => vacantPosition.x === x + 1 && vacantPosition.y === y,
+        )
+    )
+        vacantPositions.push({ x: x + 1, y })
+
+    if (
+        state.board?.[x]?.[y + 1] === false &&
+        !vacantPositions.find(
+            (vacantPosition) => vacantPosition.x === x && vacantPosition.y === y + 1,
+        )
+    )
+        vacantPositions.push({ x, y: y + 1 })
 
     state.vacantPositions = vacantPositions
 }
@@ -41,9 +68,7 @@ const findStartPoint: TFindStartPoint = (state) => {
         vacantPositions.length > 0 &&
         vacantPositions[Math.abs(Math.round(Math.random() * vacantPositions.length - 1))]
 
-    if (!position) return
-
-    setActualPosition(state, position)
+    if (position) setActualPosition(state, position)
 }
 
 const walk: TWalk = (state) => {
@@ -77,24 +102,36 @@ const walk: TWalk = (state) => {
 }
 
 export const Walker: TWalker = ({ baseBoard, walkable }) => {
+    const board = []
+
+    for (const x of baseBoard) {
+        const xCopy = []
+
+        for (const y of x) {
+            xCopy.push(y)
+        }
+
+        board.push(xCopy)
+    }
+
     const state: IWalkerState = {
-        board: baseBoard.map((x) => x.map((y) => y)),
+        board,
         maxX: baseBoard.length,
         maxY: baseBoard[0].length,
-        actualPosition: {
-            x: Math.round(baseBoard.length / 2),
-            y: Math.round(baseBoard[0].length / 2),
-        },
+        actualPosition: { x: 0, y: 0 },
         vacantPositions: [],
     }
 
-    updateVacantPositions(state, state.actualPosition)
+    setActualPosition(state, {
+        x: Math.round(state.maxX / 2),
+        y: Math.round(state.maxY / 2),
+    })
 
     const maxSteps = Math.round(
         baseBoard.length * baseBoard[0].length * (walkable >= 0 && walkable <= 1 ? walkable : 0.5),
     )
 
-    for (let step = 0; step < maxSteps; step++) {
+    for (let step = 1; step < maxSteps; step++) {
         walk(state)
     }
 

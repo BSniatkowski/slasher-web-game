@@ -1,3 +1,5 @@
+const isDev = import.meta.env.DEV
+
 import {
     BufferGeometry,
     CylinderGeometry,
@@ -11,9 +13,11 @@ import {
     Vector3,
 } from 'three'
 
+import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
+import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
+import { createPathfindingManager } from '../PathfindingManager/PathfindingManager'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
-import { createPathfindingManager } from './PathfindingManager/PathfindingManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
 
 export const createPlayerManager: TCreatePlayerManager = ({
@@ -21,6 +25,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     Scene,
     Camera,
     ResourceTracker,
+    AnimationManager,
 }) => {
     const state: IPlayerManagerState = {
         player: null,
@@ -30,17 +35,32 @@ export const createPlayerManager: TCreatePlayerManager = ({
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
+    const PathfindingManager = createPathfindingManager({ Scene, ResourceTracker })
 
-    const updatePlayerPosition = (state: IPlayerManagerState, destination: Vector3) => {
-        state.player?.position.copy(destination).add(new Vector3(0, 0, 0.25))
+    const updatePointer: TUpdatePointer = (event) => {
+        state.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+        state.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+    }
+
+    const updatePlayerPosition = (destination: Vector3) => {
+        state.player?.position.copy(destination).setZ(0.25)
+        state.player?.updateMatrix()
         CameraManager.lookCameraAtPlayer()
     }
 
-    const initPlayer = (state: IPlayerManagerState) => {
-        const geometry = new CylinderGeometry(0.25, 0.25, 0.5)
-        const material = new MeshBasicMaterial({ color: 'green' })
+    const initPlayer = () => {
+        const geometry = new CylinderGeometry(0.25, 0.25, 0.5, 16)
+        const material = new MeshBasicMaterial({
+            color: 'green',
+            depthTest: false,
+            depthWrite: false,
+            transparent: true,
+        })
 
         const playerMesh = new Mesh(geometry, material)
+        playerMesh.matrixAutoUpdate = false
+        playerMesh.renderOrder = 3
+
         playerMesh.rotateX(MathUtils.degToRad(90))
 
         ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
@@ -58,25 +78,25 @@ export const createPlayerManager: TCreatePlayerManager = ({
         board.geometry.computeBoundingBox()
         board.geometry.boundingBox?.getCenter(centerVector)
 
-        updatePlayerPosition(state, centerVector)
-    }
-
-    const PathfindingManager = createPathfindingManager({ Scene, ResourceTracker })
-
-    const updatePointer: TUpdatePointer = (state, event) => {
-        state.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-        state.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+        updatePlayerPosition(centerVector)
     }
 
     const initPathVisialization = () => {
-        if (!state.player) return
+        if (!isDev || !state.player) return
 
-        const path3D = [state.player?.position.clone()]
+        const path3D = [state.player.position.clone()]
 
         const geometry = new BufferGeometry().setFromPoints(path3D)
-        const material = new LineBasicMaterial({ color: 'purple' })
+        const material = new LineBasicMaterial({
+            color: 'purple',
+            depthTest: false,
+            depthWrite: false,
+            transparent: true,
+        })
 
         const pathMesh = new Line(geometry, material)
+        pathMesh.matrixAutoUpdate = false
+        pathMesh.renderOrder = 2
 
         ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
 
@@ -85,13 +105,14 @@ export const createPlayerManager: TCreatePlayerManager = ({
         Scene.add(pathMesh)
     }
 
-    const visualizePath = ({ path }: { path: Array<Vector2> }) => {
-        const path3D = path.map((point) => new Vector3(point.x, point.y, 0.1))
+    const visualizePath = ({ path }: { path: Array<Vector3> }) => {
+        if (!state.pathMesh) return
 
-        if (state.pathMesh) state.pathMesh.geometry.setFromPoints(path3D)
+        state.pathMesh.geometry.setFromPoints(path)
+        state.pathMesh.updateMatrix()
     }
 
-    const goToPosition = (state: IPlayerManagerState) => {
+    const goToPosition = () => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
         const board = ResourceTracker.getTrackedResource('board')
@@ -102,36 +123,59 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const destination = intersects.length > 0 && intersects[0].point
 
-        if (!destination || !state.player?.position) return
+        if (!destination || !state.player) return
 
-        const startPosition = new Vector2(state.player.position.x, state.player.position.y)
-            .multiplyScalar(100)
-            .round()
-            .divideScalar(100)
+        const startPosition = state.player.position.clone()
 
-        const destinationPosition = new Vector2(destination.x, destination.y)
-            .multiplyScalar(100)
-            .round()
-            .divideScalar(100)
+        const destinationPosition = destination.clone()
 
         const { path } = PathfindingManager.findPath({
             startPosition,
             destinationPosition,
         })
 
-        if (path) visualizePath({ path })
+        if (isDev && path) visualizePath({ path })
+
+        AnimationManager.clearAnimation('player_move')
+
+        if (path.length === 0) return
+
+        const positionGetter = () => state.player?.position.clone().setZ(0) ?? new Vector3()
+        const isPossibleGetter = () => true // TODO - update with introducing movement emparing logic
+        const isEndedGetter = () =>
+            state.player
+                ? state.player.position
+                      .clone()
+                      .setZ(0)
+                      .distanceToSquared(path[path.length - 1]) === 0
+                : true
+
+        AnimationManager.addAnimation({
+            id: 'player_move',
+            type: EAnimationTypes.dynamic,
+            callback: createMoveAlongPathAnimation({
+                path,
+                speed: 0.005,
+                positionGetter,
+                positionUpdate: updatePlayerPosition,
+            }),
+            isPossibleGetter,
+            isEndedGetter,
+        })
     }
 
     const InputsManager = createInputsManager({
         ref,
         keybindings: {
-            contextmenu: () => goToPosition(state),
-            pointermove: (event) => updatePointer(state, event as PointerEvent),
+            click: goToPosition,
+            contextmenu: goToPosition,
+            touchdown: goToPosition,
+            pointermove: (event) => updatePointer(event as PointerEvent),
         },
     })
 
     const init = () => {
-        initPlayer(state)
+        initPlayer()
         CameraManager.init()
         PathfindingManager.init()
         initPathVisialization()

@@ -1,6 +1,6 @@
 import { Scene, Vector2 } from 'three'
 
-import { TResourceTracker } from '../../../../../ResourceTracker/ResourceTracker.types'
+import { TResourceTracker } from '../../../../ResourceTracker/ResourceTracker.types'
 
 export type TCentroidsHelper = ({
     Scene,

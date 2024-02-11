@@ -25,11 +25,13 @@ const checkIfPointIsInsideTriangle = ({
 
 export const createNodeChecker: TCreateNodeChecker = ({ graph }) => {
     const findNodeByPosition: TFindNodeByPosition = ({ position }) => {
+        const position2D = new Vector2(position.x, position.y)
+
         for (const graphNode of graph) {
             const { id, polygons } = graphNode
 
             const isInsideTriangle = checkIfPointIsInsideTriangle({
-                position,
+                position: position2D,
                 polygons,
             })
 

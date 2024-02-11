@@ -1,6 +1,6 @@
 const isDev = import.meta.env.DEV
 
-import { Mesh, MeshBasicMaterial, SphereGeometry, Vector2 } from 'three'
+import { CircleGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three'
 
 import { TPolygonsHelper } from './PolygonsHelper.types'
 
@@ -15,11 +15,16 @@ export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board 
 
     if (!isDev) return { polygons }
 
-    const polygonGeometry = new SphereGeometry(0.1, 8, 0.1)
-    const polygonMaterial = new MeshBasicMaterial({ color: 'blue' })
+    const polygonGeometry = new CircleGeometry(0.05, 12)
+    const polygonMaterial = new MeshBasicMaterial({
+        color: 'blue',
+        depthTest: false,
+        depthWrite: false,
+    })
 
     const polygonMesh = new Mesh(polygonGeometry, polygonMaterial)
     polygonMesh.matrixAutoUpdate = false
+    polygonMesh.renderOrder = 1
 
     const uniquePolygonsForPresentation = polygons.length > 0 ? [polygons[0]] : []
 
@@ -37,7 +42,7 @@ export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board 
         newPolygonMesh.position.set(
             uniquePolygonsForPresentation[polygonIndex].x,
             uniquePolygonsForPresentation[polygonIndex].y,
-            0.05,
+            0,
         )
         newPolygonMesh.updateMatrix()
 

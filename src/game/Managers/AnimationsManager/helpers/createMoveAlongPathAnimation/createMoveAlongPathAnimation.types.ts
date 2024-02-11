@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from 'three'
+import { Vector3 } from 'three'
 
 export type TCreateMoveAlongPathAnimation = ({
     path,
@@ -6,7 +6,7 @@ export type TCreateMoveAlongPathAnimation = ({
     positionGetter,
     positionUpdate,
 }: {
-    path: Array<Vector2>
+    path: Array<Vector3>
     speed: number
     positionGetter: () => Vector3 | undefined
     positionUpdate: (position: Vector3) => void

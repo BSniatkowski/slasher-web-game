@@ -1,4 +1,4 @@
-import { Scene, Vector2 } from 'three'
+import { Scene, Vector3 } from 'three'
 
 import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
 import { TGraph } from './helpers/GraphHelper/GraphHelper.types'
@@ -13,10 +13,10 @@ export type TFindPath = ({
     startPosition,
     destinationPosition,
 }: {
-    startPosition: Vector2
-    destinationPosition: Vector2
+    startPosition: Vector3
+    destinationPosition: Vector3
 }) => {
-    path: Array<Vector2>
+    path: Array<Vector3>
 }
 
 export type TCreatePathfindingManager = ({

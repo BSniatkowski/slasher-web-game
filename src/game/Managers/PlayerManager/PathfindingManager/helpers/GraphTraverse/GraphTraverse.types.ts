@@ -1,4 +1,4 @@
-import { Vector2 } from 'three'
+import { Vector3 } from 'three'
 
 import { IGraphNode, TGraph } from '../GraphHelper/GraphHelper.types'
 
@@ -11,7 +11,7 @@ export type TGraphTraverse = ({
     destinationNodeId: string
     graph: TGraph
 }) => {
-    path: Array<Vector2>
+    path: Array<Vector3>
 }
 
 export interface IGraphNodeCopy extends IGraphNode {

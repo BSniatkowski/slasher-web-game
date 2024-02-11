@@ -1,16 +1,16 @@
 const isDev = import.meta.env.DEV
 
-import { Mesh, MeshBasicMaterial, SphereGeometry, Vector2 } from 'three'
+import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three'
 
 import { TPolygonsHelper } from './PolygonsHelper.types'
 
 export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board }) => {
     const pointsArray = board.geometry.getAttribute('position').array
 
-    const polygons: Array<Vector2> = []
+    const polygons: Array<Vector3> = []
 
     for (let polygonIndex = 0; polygonIndex < pointsArray.length; polygonIndex += 3) {
-        polygons.push(new Vector2(pointsArray[polygonIndex], pointsArray[polygonIndex + 1]))
+        polygons.push(new Vector3(pointsArray[polygonIndex], pointsArray[polygonIndex + 1]))
     }
 
     if (!isDev) return { polygons }

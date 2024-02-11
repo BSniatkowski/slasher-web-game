@@ -24,15 +24,7 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
         const position = positionGetter()
 
         if (position)
-            return (
-                speed /
-                position.distanceToSquared(
-                    new Vector3(
-                        state.pathCopy[state.actualPointIndex].x,
-                        state.pathCopy[state.actualPointIndex].y,
-                    ),
-                )
-            )
+            return speed / position.distanceToSquared(state.pathCopy[state.actualPointIndex])
     }
 
     const checkIfPointIsAchieved = (point: Vector3) => {
@@ -42,12 +34,7 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
     }
 
     const callback = () => {
-        const isPointAchieved = checkIfPointIsAchieved(
-            new Vector3(
-                state.pathCopy[state.actualPointIndex].x,
-                state.pathCopy[state.actualPointIndex].y,
-            ),
-        )
+        const isPointAchieved = checkIfPointIsAchieved(state.pathCopy[state.actualPointIndex])
 
         if (isPointAchieved) {
             if (state.actualPointIndex + 1 < state.pathCopy.length) state.actualPointIndex++
@@ -64,10 +51,7 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
 
         const newPosition = new Vector3().lerpVectors(
             actualPosition,
-            new Vector3(
-                state.pathCopy[state.actualPointIndex].x,
-                state.pathCopy[state.actualPointIndex].y,
-            ),
+            state.pathCopy[state.actualPointIndex],
             lerpAlpha,
         )
 

@@ -1,4 +1,4 @@
-import { Vector2 } from 'three'
+import { Vector3 } from 'three'
 
 import { TCreateNodeChecker, TFindNodeByPosition } from './NodeChecker.types'
 
@@ -6,8 +6,8 @@ const checkIfPointIsInsideTriangle = ({
     position,
     polygons,
 }: {
-    position: Vector2
-    polygons: Array<Vector2>
+    position: Vector3
+    polygons: Array<Vector3>
 }) => {
     const p1 = polygons[0]
     const p2 = polygons[1]

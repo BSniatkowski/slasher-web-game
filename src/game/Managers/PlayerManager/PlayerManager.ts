@@ -75,10 +75,14 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const initPathVisialization = () => {
         if (!isDev || !state.player) return
 
-        const path3D = [state.player?.position.clone()]
+        const path3D = [state.player.position.clone()]
 
         const geometry = new BufferGeometry().setFromPoints(path3D)
-        const material = new LineBasicMaterial({ color: 'purple', depthTest: false })
+        const material = new LineBasicMaterial({
+            color: 'purple',
+            depthTest: false,
+            depthWrite: false,
+        })
 
         const pathMesh = new Line(geometry, material)
 
@@ -89,7 +93,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         Scene.add(pathMesh)
     }
 
-    const visualizePath = ({ path }: { path: Array<Vector2> }) => {
+    const visualizePath = ({ path }: { path: Array<Vector3> }) => {
         const path3D = path.map((point) => new Vector3(point.x, point.y))
 
         if (state.pathMesh) state.pathMesh.geometry.setFromPoints(path3D)
@@ -106,17 +110,11 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const destination = intersects.length > 0 && intersects[0].point
 
-        if (!destination || !state.player || !state.player.position) return
+        if (!destination || !state.player) return
 
-        const startPosition = new Vector2(state.player.position.x, state.player.position.y)
-            .multiplyScalar(100)
-            .round()
-            .divideScalar(100)
+        const startPosition = state.player.position.clone()
 
-        const destinationPosition = new Vector2(destination.x, destination.y)
-            .multiplyScalar(100)
-            .round()
-            .divideScalar(100)
+        const destinationPosition = destination.clone()
 
         const { path } = PathfindingManager.findPath({
             startPosition,
@@ -129,20 +127,24 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         if (path.length === 0) return
 
+        const positionGetter = () => state.player?.position ?? new Vector3()
+        const isPossibleGetter = () => true // TODO - update with introducing movement emparing logic
+        const isEndedGetter = () =>
+            state.player
+                ? state.player.position.distanceToSquared(path[path.length - 1]) < 0.1
+                : true
+
         AnimationManager.addAnimation({
             id: 'player_move',
             type: EAnimationTypes.dynamic,
             callback: createMoveAlongPathAnimation({
                 path,
                 speed: 0.01,
-                positionGetter: () => state?.player?.position,
+                positionGetter,
                 positionUpdate: updatePlayerPosition,
             }),
-            isPossibleGetter: () => true, // TODO - update with introducing movement emparing logic
-            isEndedGetter: () =>
-                state.player.position.distanceToSquared(
-                    new Vector3(path[path.length - 1].x, path[path.length - 1].y),
-                ) < 0.1,
+            isPossibleGetter,
+            isEndedGetter,
         })
     }
 

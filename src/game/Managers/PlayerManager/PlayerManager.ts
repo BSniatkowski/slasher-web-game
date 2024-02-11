@@ -15,9 +15,9 @@ import {
 
 import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
 import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
+import { createPathfindingManager } from '../PathfindingManager/PathfindingManager'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
-import { createPathfindingManager } from './PathfindingManager/PathfindingManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
 
 export const createPlayerManager: TCreatePlayerManager = ({

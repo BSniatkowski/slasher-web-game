@@ -46,7 +46,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
 
         if (!startNodeId || !destinationNodeId || !state.graph) {
             console.warn(
-                'Something wnet wrong and pathfinding is not possible!',
+                'Something went wrong and pathfinding is not possible!',
                 startNodeId,
                 destinationNodeId,
                 state.graph,
@@ -55,7 +55,13 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
             return { path: [startPosition, destinationPosition] }
         }
 
-        const { path } = GraphTraverse({ startNodeId, destinationNodeId, graph: state.graph })
+        const { path } = GraphTraverse({
+            startPosition,
+            startNodeId,
+            destinationPosition,
+            destinationNodeId,
+            graph: state.graph,
+        })
 
         return { path }
     }

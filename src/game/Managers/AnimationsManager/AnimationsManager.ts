@@ -12,28 +12,6 @@ export const createAnimationManager = () => {
         animations: [],
     }
 
-    const animate = () => {
-        for (const animation of state.animations) {
-            switch (animation.type) {
-                case EAnimationTypes.simple: {
-                    if (animation.tick < animation.ticksDuration) {
-                        animation.callback({
-                            tick: animation.tick,
-                            ticksDuration: animation.ticksDuration,
-                        })
-                        animation.tick++
-                    }
-                    break
-                }
-                case EAnimationTypes.dynamic: {
-                    if (animation.isPossibleGetter()) animation.callback()
-
-                    break
-                }
-            }
-        }
-    }
-
     const addAnimation: TAddAnimation = (animation) => {
         switch (animation.type) {
             case EAnimationTypes.simple: {
@@ -110,11 +88,35 @@ export const createAnimationManager = () => {
         state.animations = state.animations.filter((animation) => {
             switch (animation.type) {
                 case EAnimationTypes.simple:
-                    return animation.tick >= animation.ticksDuration
+                    return animation.tick < animation.ticksDuration
                 case EAnimationTypes.dynamic:
-                    return animation.isEndedGetter()
+                    return !animation.isEndedGetter()
             }
         })
+    }
+
+    const animate = () => {
+        for (const animation of state.animations) {
+            switch (animation.type) {
+                case EAnimationTypes.simple: {
+                    if (animation.tick < animation.ticksDuration) {
+                        animation.callback({
+                            tick: animation.tick,
+                            ticksDuration: animation.ticksDuration,
+                        })
+                        animation.tick++
+                    }
+                    break
+                }
+                case EAnimationTypes.dynamic: {
+                    if (animation.isPossibleGetter()) animation.callback()
+
+                    break
+                }
+            }
+        }
+
+        clearAllEndedAnimations()
     }
 
     return { animate, addAnimation, clearAnimation, clearAllEndedAnimations }

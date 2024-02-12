@@ -3,11 +3,15 @@ import { Vector3 } from 'three'
 import { IGraphNode, TGraph } from '../GraphHelper/GraphHelper.types'
 
 export type TGraphTraverse = ({
+    startPosition,
     startNodeId,
+    destinationPosition,
     destinationNodeId,
     graph,
 }: {
+    startPosition: Vector3
     startNodeId: string
+    destinationPosition: Vector3
     destinationNodeId: string
     graph: TGraph
 }) => {

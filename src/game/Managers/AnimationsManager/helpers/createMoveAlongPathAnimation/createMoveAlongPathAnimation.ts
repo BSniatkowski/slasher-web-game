@@ -1,74 +1,88 @@
-import { Vector3 } from 'three'
-
-import { TCreateMoveAlongPathAnimation } from './createMoveAlongPathAnimation.types'
+import {
+    IMoveAlongPathAnimationState,
+    TCreateMoveAlongPathAnimation,
+    TFindLerpBetweenPathPoints,
+    TFindNextPosition,
+} from './createMoveAlongPathAnimation.types'
 
 export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
     path,
-    speed,
-    positionGetter,
+    speedGetter,
     positionUpdate,
 }) => {
-    const pathCopy = []
-
-    for (const point of path) {
-        pathCopy.push(point.clone())
+    const state: IMoveAlongPathAnimationState = {
+        pathCopy: [],
+        distanceTraveled: 0,
+        pathDistances: [],
     }
 
-    const state = {
-        pathCopy,
-        actualPointIndex: 0,
-        vectorLerpPerTick: 0,
-        additonalLerpSpeed: 0,
+    for (let pointIndex = 0; pointIndex < path.length; pointIndex++) {
+        state.pathCopy.push(path[pointIndex].clone())
+
+        if (pointIndex === path.length - 1) break
+
+        state.pathDistances.push(path[pointIndex].manhattanDistanceTo(path[pointIndex + 1]))
     }
 
-    const calculateVectorLerpPerTick = () => {
-        const position = positionGetter()
+    const findNextPathPartIndexAndMinDistance = () => {
+        const currentSpeed = speedGetter()
 
-        if (!position) return
+        const nextDistanceTraveled = state.distanceTraveled + currentSpeed
 
-        const distance = position.distanceToSquared(state.pathCopy[state.actualPointIndex])
+        for (let distanceIndex = 0; distanceIndex < state.pathDistances.length; distanceIndex++) {
+            const minDistanceForPathPart = state.pathDistances
+                .slice(0, distanceIndex)
+                .reduce((acc, el) => (acc += el), 0)
 
-        const currentSpeed = speed + state.additonalLerpSpeed
+            const maxDistanceForPathPart =
+                minDistanceForPathPart + state.pathDistances[distanceIndex]
 
-        if (distance < currentSpeed) {
-            state.additonalLerpSpeed += speed - distance
-            return 1
+            if (
+                nextDistanceTraveled >= minDistanceForPathPart &&
+                nextDistanceTraveled < maxDistanceForPathPart
+            )
+                return { distanceIndex, minDistanceForPathPart, currentSpeed }
         }
-
-        state.additonalLerpSpeed = 0
-
-        return currentSpeed / distance
     }
 
-    const checkIfPointIsAchieved = (point: Vector3) => {
-        const position = positionGetter()
+    const findLerpBetweenPathPoints: TFindLerpBetweenPathPoints = ({
+        distanceIndex,
+        minDistanceForPathPart,
+        currentSpeed,
+    }) => {
+        const fullDistanceBetweenPoints = state.pathDistances[distanceIndex]
+        const nextTraveledDistanceWithCurrentSpeed =
+            state.distanceTraveled - minDistanceForPathPart + currentSpeed
 
-        if (position) return position.distanceToSquared(point) === 0
+        return nextTraveledDistanceWithCurrentSpeed / fullDistanceBetweenPoints
+    }
+
+    const findNextPosition: TFindNextPosition = ({ distanceIndex, lerpAlpha }) => {
+        return state.pathCopy[distanceIndex]
+            .clone()
+            .lerp(state.pathCopy[distanceIndex + 1], lerpAlpha)
     }
 
     const callback = () => {
-        const isPointAchieved = checkIfPointIsAchieved(state.pathCopy[state.actualPointIndex])
+        const nextMoveProps = findNextPathPartIndexAndMinDistance()
 
-        if (isPointAchieved) {
-            if (state.actualPointIndex + 1 < state.pathCopy.length) state.actualPointIndex++
+        if (!nextMoveProps) {
+            console.log('end')
+
+            positionUpdate(state.pathCopy[state.pathCopy.length - 1])
             return
         }
 
-        const lerpAlpha = calculateVectorLerpPerTick()
+        const lerpAlpha = findLerpBetweenPathPoints(nextMoveProps)
 
-        if (!lerpAlpha) return
-
-        const actualPosition = positionGetter()
-
-        if (!actualPosition) return
-
-        const newPosition = new Vector3().lerpVectors(
-            actualPosition,
-            state.pathCopy[state.actualPointIndex],
+        const nextPosition = findNextPosition({
+            ...nextMoveProps,
             lerpAlpha,
-        )
+        })
 
-        positionUpdate(newPosition)
+        state.distanceTraveled += nextMoveProps.currentSpeed
+
+        positionUpdate(nextPosition)
     }
 
     return callback

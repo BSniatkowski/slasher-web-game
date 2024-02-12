@@ -1,13 +1,35 @@
 import { Vector3 } from 'three'
 
+export interface IMoveAlongPathAnimationState {
+    pathCopy: Array<Vector3>
+    distanceTraveled: number
+    pathDistances: Array<number>
+}
+
+export type TFindLerpBetweenPathPoints = ({
+    distanceIndex,
+    minDistanceForPathPart,
+    currentSpeed,
+}: {
+    distanceIndex: number
+    minDistanceForPathPart: number
+    currentSpeed: number
+}) => number
+
+export type TFindNextPosition = ({
+    distanceIndex,
+    lerpAlpha,
+}: {
+    distanceIndex: number
+    lerpAlpha: number
+}) => Vector3
+
 export type TCreateMoveAlongPathAnimation = ({
     path,
-    speed,
-    positionGetter,
+    speedGetter,
     positionUpdate,
 }: {
     path: Array<Vector3>
-    speed: number
-    positionGetter: () => Vector3 | undefined
+    speedGetter: () => number
     positionUpdate: (position: Vector3) => void
 }) => () => void

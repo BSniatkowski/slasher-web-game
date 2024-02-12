@@ -14,8 +14,8 @@ export interface ISimpleAnimation {
 export interface IDynamicAnimation {
     id: string
     type: EAnimationTypes.dynamic
-    isPossibleGetter: () => boolean | undefined
-    isEndedGetter: () => boolean | undefined
+    isPossibleGetter: () => boolean
+    isEndedGetter: () => boolean
     callback: () => void
 }
 

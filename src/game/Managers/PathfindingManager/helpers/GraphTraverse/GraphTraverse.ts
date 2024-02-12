@@ -26,7 +26,13 @@ const checkIfHasSameNodeDownPreviousNodes: TCheckIfHasSameNodeDownPreviousNodes 
     return false
 }
 
-export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, graph }) => {
+export const GraphTraverse: TGraphTraverse = ({
+    startPosition,
+    startNodeId,
+    destinationPosition,
+    destinationNodeId,
+    graph,
+}) => {
     const originalStartNode = graph.find(({ id }) => id === startNodeId)
     const originalDestinationNode = graph.find(({ id }) => id === destinationNodeId)
 
@@ -34,7 +40,7 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     const startNode: IGraphNodeCopy = {
         ...originalStartNode,
-        distance: originalDestinationNode.center.distanceToSquared(originalStartNode.center),
+        distance: originalDestinationNode.center.manhattanDistanceTo(originalStartNode.center),
         neighborNodes: [],
         stepped: true,
     }
@@ -51,7 +57,7 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         if (graphNode.id !== startNodeId && graphNode.id !== destinationNodeId)
             graphCopy.push({
                 ...graphNode,
-                distance: destinationNode.center.distanceToSquared(graphNode.center),
+                distance: destinationNode.center.manhattanDistanceTo(graphNode.center),
                 neighborNodes: [],
             })
     }
@@ -99,13 +105,19 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
 
     const notOptimizedPath = getPathFromDestinationNode(destinationNodeWithPath)
 
-    for (const node of notOptimizedPath) {
+    for (let nodeIndex = 0; nodeIndex < notOptimizedPath.length; nodeIndex++) {
         const shortageNode = checkIfHasSameNodeDownPreviousNodes(
-            node,
-            node.neighborNodes.filter(({ id }) => id !== node.previousNode?.id),
+            notOptimizedPath[nodeIndex],
+            notOptimizedPath[nodeIndex].neighborNodes.filter(
+                ({ id }) => id !== notOptimizedPath[nodeIndex].previousNode?.id,
+            ),
         ) as IGraphNodeCopy
 
-        if (shortageNode) node.previousNode = shortageNode
+        if (shortageNode) {
+            notOptimizedPath[nodeIndex].previousNode = shortageNode
+
+            nodeIndex = notOptimizedPath.findIndex((node) => node.id === shortageNode.id)
+        }
     }
 
     const path2D = getPathFromDestinationNode(destinationNodeWithPath)
@@ -116,9 +128,9 @@ export const GraphTraverse: TGraphTraverse = ({ startNodeId, destinationNodeId, 
         path.push(new Vector3(node.center.x, node.center.y))
     }
 
+    path[0] = destinationPosition
+    path[path.length - 1] = startPosition.clone().setZ(0)
     path.reverse()
 
-    return {
-        path,
-    }
+    return { path }
 }

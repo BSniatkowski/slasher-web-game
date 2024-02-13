@@ -67,8 +67,6 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
         const nextMoveProps = findNextPathPartIndexAndMinDistance()
 
         if (!nextMoveProps) {
-            console.log('end')
-
             positionUpdate(state.pathCopy[state.pathCopy.length - 1])
             return
         }

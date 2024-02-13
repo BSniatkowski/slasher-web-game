@@ -54,7 +54,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
             color: 'green',
             depthTest: false,
             depthWrite: false,
-            transparent: true,
         })
 
         const playerMesh = new Mesh(geometry, material)
@@ -69,16 +68,13 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         Scene.add(playerMesh)
 
-        const board = ResourceTracker.getTrackedResource('board')
+        const { node } = PathfindingManager.getRandomNode()
 
-        if (!board) return
+        if (!node) return
 
-        const centerVector = new Vector3()
+        const initialPosition = new Vector3(node.center.x, node.center.y)
 
-        board.geometry.computeBoundingBox()
-        board.geometry.boundingBox?.getCenter(centerVector)
-
-        updatePlayerPosition(centerVector)
+        updatePlayerPosition(initialPosition)
     }
 
     const initPathVisialization = () => {
@@ -154,7 +150,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
             type: EAnimationTypes.dynamic,
             callback: createMoveAlongPathAnimation({
                 path,
-                speedGetter: () => 0.01,
+                speedGetter: () => 0.025,
                 positionUpdate: updatePlayerPosition,
             }),
             isPossibleGetter,
@@ -173,9 +169,9 @@ export const createPlayerManager: TCreatePlayerManager = ({
     })
 
     const init = () => {
-        initPlayer()
         CameraManager.init()
         PathfindingManager.init()
+        initPlayer()
         initPathVisialization()
         InputsManager.init()
     }

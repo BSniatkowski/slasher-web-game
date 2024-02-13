@@ -8,5 +8,7 @@ export const createArenaManager: TCreateArenaManager = ({ Scene, ResourceTracker
         BoardManager.generateBoard()
     }
 
+    const populateWithEnemies = () => {}
+
     return { generateBoard }
 }

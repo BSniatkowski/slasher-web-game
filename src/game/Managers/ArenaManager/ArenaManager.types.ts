@@ -16,3 +16,5 @@ export type TCreateArenaManager = ({
 }) => {
     generateBoard: () => void
 }
+
+export type TArenaManager = ReturnType<TCreateArenaManager>

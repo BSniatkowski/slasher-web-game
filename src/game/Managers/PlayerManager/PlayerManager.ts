@@ -154,7 +154,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
             type: EAnimationTypes.dynamic,
             callback: createMoveAlongPathAnimation({
                 path,
-                speedGetter: () => 0.01,
+                speedGetter: () => 0.025,
                 positionUpdate: updatePlayerPosition,
             }),
             isPossibleGetter,

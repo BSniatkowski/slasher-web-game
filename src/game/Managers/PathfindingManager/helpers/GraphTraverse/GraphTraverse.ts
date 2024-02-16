@@ -40,7 +40,7 @@ export const GraphTraverse: TGraphTraverse = ({
 
     const startNode: IGraphNodeCopy = {
         ...originalStartNode,
-        distance: originalDestinationNode.center.manhattanDistanceTo(originalStartNode.center),
+        distance: originalDestinationNode.center.distanceTo(originalStartNode.center),
         neighborNodes: [],
         stepped: true,
     }
@@ -57,7 +57,7 @@ export const GraphTraverse: TGraphTraverse = ({
         if (graphNode.id !== startNodeId && graphNode.id !== destinationNodeId)
             graphCopy.push({
                 ...graphNode,
-                distance: destinationNode.center.manhattanDistanceTo(graphNode.center),
+                distance: destinationNode.center.distanceTo(graphNode.center),
                 neighborNodes: [],
             })
     }

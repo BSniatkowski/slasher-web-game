@@ -6,10 +6,11 @@ export enum EEnemyBehaviours {
     chasing,
 }
 
-export interface IEnemyStats {
+export interface IEnemyBasicStats {
     id: string
     movementSpeed: number
     range: number
+    maxHp: number
     behaviour: EEnemyBehaviours
     lastPlayerKnownPosition: Vector3 | null
 }
@@ -20,18 +21,18 @@ export enum EEnemyTypes {
     tank,
 }
 
-export interface ISoldier extends IEnemyStats {
+export interface ISoldier extends IEnemyBasicStats {
     type: EEnemyTypes.soldier
 }
 
-export interface IArcher extends IEnemyStats {
+export interface IArcher extends IEnemyBasicStats {
     type: EEnemyTypes.archer
 }
 
-export interface ITank extends IEnemyStats {
+export interface ITank extends IEnemyBasicStats {
     type: EEnemyTypes.tank
 }
 
-export type TEnemy = ISoldier | IArcher | ITank
+export type TEnemyStats = ISoldier | IArcher | ITank
 
-export type TCreateEnemy = ({ id }: { id: string }) => TEnemy
+export type TCreateEnemy = ({ id }: { id: string }) => TEnemyStats

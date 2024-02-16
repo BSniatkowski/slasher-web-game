@@ -14,10 +14,12 @@ import {
 export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const state: IResourceTrackerState = { Scene, resources: [] }
 
-    const trackResource: TTrackResource = (resource) => {
-        if (isDev && allLogs) console.log(`Resource of id: ${resource.id} is now tracked.`)
+    const trackResource: TTrackResource = (resourceItem) => {
+        if (isDev && allLogs) console.log(`Resource of id: ${resourceItem.id} is now tracked.`)
 
-        state.resources = [...state.resources, resource]
+        state.resources = [...state.resources, resourceItem]
+
+        Scene.add(resourceItem.resource)
     }
 
     const getTrackedResource: TGetTrackedResource = (id) =>

@@ -8,7 +8,7 @@ const maxSize = {
     y: 100,
 }
 
-export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker }) => {
+export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => {
     const state: IBoardState = {
         board: [],
         boardModel: null,
@@ -31,8 +31,6 @@ export const createBoardManager: TCreateBoardManager = ({ Scene, ResourceTracker
         state.boardModel = boardModel
 
         ResourceTracker.trackResource({ id: 'board', resource: boardModel })
-
-        Scene.add(boardModel)
     }
 
     return { generateBoard }

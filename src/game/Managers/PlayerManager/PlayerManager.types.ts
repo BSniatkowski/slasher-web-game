@@ -5,12 +5,12 @@ import {
     MeshBasicMaterial,
     PerspectiveCamera,
     Raycaster,
-    Scene,
     Vector2,
 } from 'three'
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TAnimationManager } from '../AnimationsManager/AnimationsManager.types'
+import { TPathfindingManager } from '../PathfindingManager/PathfindingManager.types'
 
 export interface IPlayerManagerState {
     player: null | Mesh<CylinderGeometry, MeshBasicMaterial>
@@ -23,15 +23,15 @@ export type TUpdatePointer = (event: PointerEvent) => void
 
 export type TCreatePlayerManager = ({
     ref,
-    Scene,
     Camera,
     ResourceTracker,
+    PathfindingManager,
     AnimationManager,
 }: {
     ref: HTMLCanvasElement
-    Scene: Scene
     Camera: PerspectiveCamera
     ResourceTracker: TResourceTracker
+    PathfindingManager: TPathfindingManager
     AnimationManager: TAnimationManager
 }) => {
     init: () => void

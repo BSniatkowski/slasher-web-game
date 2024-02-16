@@ -4,6 +4,7 @@ import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
 import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
+import { createNodeGetter } from './helpers/NodeGetter/NodeGetter'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
     IPathfindingManagerState,
@@ -15,6 +16,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
     const state: IPathfindingManagerState = {
         graph: null,
         NodeChecker: null,
+        NodeGetter: null,
     }
 
     const init = () => {
@@ -31,6 +33,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
         state.graph = graph
 
         state.NodeChecker = createNodeChecker({ graph })
+        state.NodeGetter = createNodeGetter({ graph })
     }
 
     const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
@@ -66,5 +69,12 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
         return { path }
     }
 
-    return { init, findPath }
+    const getRandomNode = () =>
+        state.NodeGetter?.getRandomNode
+            ? state.NodeGetter.getRandomNode()
+            : {
+                  node: null,
+              }
+
+    return { init, findPath, getRandomNode }
 }

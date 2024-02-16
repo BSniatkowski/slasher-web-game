@@ -3,6 +3,7 @@ import { PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from 'three'
 import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
 import { createAnimationManager } from './Managers/AnimationsManager/AnimationsManager'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
+import { createPathfindingManager } from './Managers/PathfindingManager/PathfindingManager'
 import { createPlayerManager } from './Managers/PlayerManager/PlayerManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 
@@ -18,33 +19,41 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const ResourceTracker = createResourceTracker(Scene)
 
-    const AnimationManager = createAnimationManager()
+    const PathfindingManager = createPathfindingManager({ Scene, ResourceTracker })
 
-    const ArenaManager = createArenaManager({ Scene, ResourceTracker })
+    const AnimationManager = createAnimationManager()
 
     const PlayerManager = createPlayerManager({
         ref: Renderer.domElement,
-        Scene,
         Camera,
         ResourceTracker,
+        PathfindingManager,
+        AnimationManager,
+    })
+
+    const ArenaManager = createArenaManager({
+        ResourceTracker,
+        PathfindingManager,
         AnimationManager,
     })
 
     const generalState = {
         isPaused: false,
-        ResourceTracker,
-        ArenaManager,
-        PlayerManager,
+        enemiesPuppeteer: ArenaManager.createEnemiesPuppeteer(),
     }
 
     const populate = () => {
         ArenaManager.generateBoard()
+        PathfindingManager.init()
+        ArenaManager.populateWithEnemies()
         PlayerManager.init()
+        generalState.enemiesPuppeteer.init()
     }
 
     const animate: TAnimate = () => {
         if (generalState.isPaused) return
 
+        generalState.enemiesPuppeteer.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)
 
@@ -58,7 +67,7 @@ export const initializeGame: TInitializeGame = (ref) => {
     const dispose: TDispose = () => {
         pause()
         PlayerManager.dispose()
-        generalState.ResourceTracker.disposeAllResources()
+        ResourceTracker.disposeAllResources()
 
         Renderer.domElement.remove()
         Renderer.dispose()

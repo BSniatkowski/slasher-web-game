@@ -15,16 +15,15 @@ import {
 
 import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
 import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
-import { createPathfindingManager } from '../PathfindingManager/PathfindingManager'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
 
 export const createPlayerManager: TCreatePlayerManager = ({
     ref,
-    Scene,
     Camera,
     ResourceTracker,
+    PathfindingManager,
     AnimationManager,
 }) => {
     const state: IPlayerManagerState = {
@@ -35,7 +34,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
-    const PathfindingManager = createPathfindingManager({ Scene, ResourceTracker })
 
     const updatePointer: TUpdatePointer = (event) => {
         state.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
@@ -54,7 +52,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
             color: 'green',
             depthTest: false,
             depthWrite: false,
-            transparent: true,
         })
 
         const playerMesh = new Mesh(geometry, material)
@@ -63,22 +60,17 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         playerMesh.rotateX(MathUtils.degToRad(90))
 
-        ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
-
         state.player = playerMesh
 
-        Scene.add(playerMesh)
+        ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
 
-        const board = ResourceTracker.getTrackedResource('board')
+        const { node } = PathfindingManager.getRandomNode()
 
-        if (!board) return
+        if (!node) return
 
-        const centerVector = new Vector3()
+        const initialPosition = new Vector3(node.center.x, node.center.y)
 
-        board.geometry.computeBoundingBox()
-        board.geometry.boundingBox?.getCenter(centerVector)
-
-        updatePlayerPosition(centerVector)
+        updatePlayerPosition(initialPosition)
     }
 
     const initPathVisialization = () => {
@@ -91,18 +83,15 @@ export const createPlayerManager: TCreatePlayerManager = ({
             color: 'purple',
             depthTest: false,
             depthWrite: false,
-            transparent: true,
         })
 
         const pathMesh = new Line(geometry, material)
         pathMesh.matrixAutoUpdate = false
         pathMesh.renderOrder = 2
 
-        ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
-
         state.pathMesh = pathMesh
 
-        Scene.add(pathMesh)
+        ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
     }
 
     const visualizePath = ({ path }: { path: Array<Vector3> }) => {
@@ -173,9 +162,9 @@ export const createPlayerManager: TCreatePlayerManager = ({
     })
 
     const init = () => {
-        initPlayer()
         CameraManager.init()
         PathfindingManager.init()
+        initPlayer()
         initPathVisialization()
         InputsManager.init()
     }

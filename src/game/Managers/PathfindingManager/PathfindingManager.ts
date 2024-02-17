@@ -4,6 +4,7 @@ import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
 import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
+import { TFindNodeIdByPosition } from './helpers/NodeChecker/NodeChecker.types'
 import { createNodeGetter } from './helpers/NodeGetter/NodeGetter'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
@@ -12,7 +13,7 @@ import {
     TFindPath,
 } from './PathfindingManager.types'
 
-export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, ResourceTracker }) => {
+export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTracker }) => {
     const state: IPathfindingManagerState = {
         graph: null,
         NodeChecker: null,
@@ -24,9 +25,9 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
 
         if (!board) return
 
-        const { polygons } = PolygonsHelper({ Scene, ResourceTracker, board })
+        const { polygons } = PolygonsHelper({ ResourceTracker, board })
 
-        const { centroids } = CentroidsHelper({ Scene, ResourceTracker, polygons })
+        const { centroids } = CentroidsHelper({ ResourceTracker, polygons })
 
         const { graph } = GraphHelper({ centroids })
 
@@ -37,15 +38,11 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
     }
 
     const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
-        if (!state.NodeChecker) return { path: [] }
+        if (!state.NodeChecker) return []
 
-        const { nodeId: startNodeId } = state.NodeChecker.findNodeByPosition({
-            position: startPosition,
-        })
+        const startNodeId = state.NodeChecker.findNodeIdByPosition(startPosition)
 
-        const { nodeId: destinationNodeId } = state.NodeChecker.findNodeByPosition({
-            position: destinationPosition,
-        })
+        const destinationNodeId = state.NodeChecker.findNodeIdByPosition(destinationPosition)
 
         if (!startNodeId || !destinationNodeId || !state.graph) {
             console.warn(
@@ -55,7 +52,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
                 state.graph,
             )
 
-            return { path: [startPosition, destinationPosition] }
+            return [startPosition, destinationPosition]
         }
 
         const { path } = GraphTraverse({
@@ -66,15 +63,16 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
             graph: state.graph,
         })
 
-        return { path }
+        return path
     }
 
     const getRandomNode = () =>
-        state.NodeGetter?.getRandomNode
-            ? state.NodeGetter.getRandomNode()
-            : {
-                  node: null,
-              }
+        state.NodeGetter?.getRandomNode ? state.NodeGetter.getRandomNode() : null
 
-    return { init, findPath, getRandomNode }
+    const getNodeIdByPosition: TFindNodeIdByPosition = (position) =>
+        state.NodeChecker?.findNodeIdByPosition
+            ? state.NodeChecker.findNodeIdByPosition(position)
+            : null
+
+    return { init, findPath, getRandomNode, getNodeIdByPosition }
 }

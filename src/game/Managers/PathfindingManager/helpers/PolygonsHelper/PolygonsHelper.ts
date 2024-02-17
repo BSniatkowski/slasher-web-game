@@ -4,7 +4,7 @@ import { CircleGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three'
 
 import { TPolygonsHelper } from './PolygonsHelper.types'
 
-export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board }) => {
+export const PolygonsHelper: TPolygonsHelper = ({ ResourceTracker, board }) => {
     const pointsArray = board.geometry.getAttribute('position').array
 
     const polygons: Array<Vector2> = []
@@ -50,7 +50,6 @@ export const PolygonsHelper: TPolygonsHelper = ({ Scene, ResourceTracker, board 
             id: `polygon${polygonIndex}`,
             resource: newPolygonMesh,
         })
-        Scene.add(newPolygonMesh)
     }
 
     return { polygons }

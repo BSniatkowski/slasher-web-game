@@ -64,7 +64,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
 
-        const { node } = PathfindingManager.getRandomNode()
+        const node = PathfindingManager.getRandomNode()
 
         if (!node) return
 
@@ -118,7 +118,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const destinationPosition = destination.clone()
 
-        const { path } = PathfindingManager.findPath({
+        const path = PathfindingManager.findPath({
             startPosition,
             destinationPosition,
         })
@@ -163,7 +163,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
     const init = () => {
         CameraManager.init()
-        PathfindingManager.init()
         initPlayer()
         initPathVisialization()
         InputsManager.init()

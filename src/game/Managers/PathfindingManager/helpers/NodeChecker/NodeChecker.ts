@@ -1,6 +1,6 @@
 import { Vector2 } from 'three'
 
-import { TCreateNodeChecker, TFindNodeByPosition } from './NodeChecker.types'
+import { TCreateNodeChecker, TFindNodeIdByPosition } from './NodeChecker.types'
 
 const checkIfPointIsInsideTriangle = ({
     position,
@@ -24,7 +24,7 @@ const checkIfPointIsInsideTriangle = ({
 }
 
 export const createNodeChecker: TCreateNodeChecker = ({ graph }) => {
-    const findNodeByPosition: TFindNodeByPosition = ({ position }) => {
+    const findNodeByPosition: TFindNodeIdByPosition = ({ position }) => {
         const position2D = new Vector2(position.x, position.y)
 
         for (const graphNode of graph) {
@@ -35,11 +35,11 @@ export const createNodeChecker: TCreateNodeChecker = ({ graph }) => {
                 polygons,
             })
 
-            if (isInsideTriangle) return { nodeId: id }
+            if (isInsideTriangle) return id
         }
 
-        return { nodeId: null }
+        return null
     }
 
-    return { findNodeByPosition }
+    return { findNodeIdByPosition: findNodeByPosition }
 }

@@ -1,17 +1,10 @@
 import { Vector3 } from 'three'
 
-export enum EEnemyBehaviours {
-    idle,
-    moving,
-    chasing,
-}
-
 export interface IEnemyBasicStats {
     id: string
     movementSpeed: number
     range: number
     maxHp: number
-    behaviour: EEnemyBehaviours
     lastPlayerKnownPosition: Vector3 | null
 }
 

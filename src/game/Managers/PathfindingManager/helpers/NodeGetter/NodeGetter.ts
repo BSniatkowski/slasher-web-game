@@ -2,19 +2,19 @@ import { TCreateNodeGetter, TGetNodeById, TGetRandomNode } from './NodeGetter.ty
 
 export const createNodeGetter: TCreateNodeGetter = ({ graph }) => {
     const getRandomNode: TGetRandomNode = () => {
-        if (!graph || graph.length === 0) return { node: null }
+        if (!graph || graph.length === 0) return null
 
         const randomNodeIndex = Math.round(Math.abs(Math.random() * graph.length - 1))
 
-        return { node: graph[randomNodeIndex] }
+        return graph[randomNodeIndex]
     }
 
     const getNodeById: TGetNodeById = ({ id }) => {
         for (const node of graph) {
-            if (node.id === id) return { node }
+            if (node.id === id) return node
         }
 
-        return { node: null }
+        return null
     }
 
     return { getNodeById, getRandomNode }

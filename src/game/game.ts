@@ -39,21 +39,19 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const generalState = {
         isPaused: false,
-        enemiesPuppeteer: ArenaManager.createEnemiesPuppeteer(),
     }
 
     const populate = () => {
         ArenaManager.generateBoard()
         PathfindingManager.init()
-        ArenaManager.populateWithEnemies()
+        ArenaManager.populate()
         PlayerManager.init()
-        generalState.enemiesPuppeteer.init()
     }
 
     const animate: TAnimate = () => {
         if (generalState.isPaused) return
 
-        generalState.enemiesPuppeteer.tick()
+        ArenaManager.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)
 

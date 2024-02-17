@@ -1,9 +1,8 @@
-import { EEnemyBehaviours, EEnemyTypes, TCreateEnemy } from './createEnemy.types'
+import { EEnemyTypes, TCreateEnemy } from './createEnemy.types'
 
 export const createEnemy: TCreateEnemy = ({ id }) => {
     const enemyStats = {
         id,
-        behaviour: EEnemyBehaviours.idle,
         lastPlayerKnownPosition: null,
     }
 

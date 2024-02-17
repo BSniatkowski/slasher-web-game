@@ -1,36 +1,27 @@
-import { CylinderGeometry, MathUtils, Mesh, MeshBasicMaterial, Vector3 } from 'three'
+import { CylinderGeometry, MathUtils, Mesh, MeshBasicMaterial } from 'three'
 
-import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
-import { createMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
 import {
     TCreateEnemyManager,
     TEnemyManagerState,
-    TUpdateBehaviour,
-    TUpdateEnemyPosition,
-    TUpdateLastPlayerKnownPosition,
+    TInitEnemy,
+    TMoveEnemy,
 } from './EnemyManager.types'
-import { EEnemyBehaviours } from './helpers/createEnemy/createEnemy.types'
 
-export const createEnemyManager: TCreateEnemyManager = ({
-    enemyStats,
-    ResourceTracker,
-    PathfindingManager,
-    AnimationManager,
-}) => {
+export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTracker }) => {
     const state: TEnemyManagerState = {
         ...enemyStats,
         hp: enemyStats.maxHp,
         enemyMesh: null,
     }
 
-    const updateEnemyPosition: TUpdateEnemyPosition = (position) => {
+    const move: TMoveEnemy = (position) => {
         if (!state.enemyMesh) return
 
-        state.enemyMesh.position.copy(position).setZ(0.25)
+        state.enemyMesh.position.set(position.x, position.y, 0.25)
         state.enemyMesh?.updateMatrix()
     }
 
-    const initEnemy = () => {
+    const init: TInitEnemy = (initialPosition) => {
         const geometry = new CylinderGeometry(0.2, 0.2, 0.25, 8)
         const material = new MeshBasicMaterial({
             color: 'yellow',
@@ -48,55 +39,12 @@ export const createEnemyManager: TCreateEnemyManager = ({
 
         ResourceTracker.trackResource({ id: `enemy_${state.id}`, resource: enemyMesh })
 
-        const { node } = PathfindingManager.getRandomNode()
-
-        if (!node) return
-
-        const initialPosition = new Vector3(node.center.x, node.center.y)
-
-        updateEnemyPosition(initialPosition)
+        move(initialPosition)
     }
 
-    const updateBehaviour: TUpdateBehaviour = (behaviour) => {
-        state.behaviour = behaviour
-    }
+    const positionGetter = () => state.enemyMesh?.position
 
-    const updateLastPlayerKnownPosition: TUpdateLastPlayerKnownPosition = (position) => {
-        if (!position || !state.enemyMesh) {
-            state.lastPlayerKnownPosition = null
+    const speedGetter = () => state.movementSpeed
 
-            AnimationManager.clearAnimation(`enemy_move_${state.id}`)
-            updateBehaviour(EEnemyBehaviours.idle)
-            return
-        }
-
-        state.lastPlayerKnownPosition = position.clone()
-        updateBehaviour(EEnemyBehaviours.chasing)
-
-        const { path } = PathfindingManager.findPath({
-            startPosition: state.enemyMesh.position,
-            destinationPosition: state.lastPlayerKnownPosition,
-        })
-
-        const isPossibleGetter = () => true
-        const isEndedGetter = () =>
-            state.enemyMesh && state.lastPlayerKnownPosition && state.range
-                ? state.enemyMesh.position.distanceTo(state.lastPlayerKnownPosition) <= state.range
-                : true
-
-        AnimationManager.clearAnimation(`enemy_move_${state.id}`)
-        AnimationManager.addAnimation({
-            id: `enemy_move_${state.id}`,
-            type: EAnimationTypes.dynamic,
-            callback: createMoveAlongPathAnimation({
-                path,
-                speedGetter: () => state.movementSpeed,
-                positionUpdate: updateEnemyPosition,
-            }),
-            isPossibleGetter,
-            isEndedGetter,
-        })
-    }
-
-    return { state, initEnemy, updateLastPlayerKnownPosition }
+    return { init, move, positionGetter, speedGetter }
 }

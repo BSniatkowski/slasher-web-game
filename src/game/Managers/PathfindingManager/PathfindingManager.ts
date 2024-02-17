@@ -39,11 +39,11 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
     const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
         if (!state.NodeChecker) return { path: [] }
 
-        const { nodeId: startNodeId } = state.NodeChecker.findNodeByPosition({
+        const startNodeId = state.NodeChecker.findNodeIdByPosition({
             position: startPosition,
         })
 
-        const { nodeId: destinationNodeId } = state.NodeChecker.findNodeByPosition({
+        const destinationNodeId = state.NodeChecker.findNodeIdByPosition({
             position: destinationPosition,
         })
 
@@ -70,11 +70,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
     }
 
     const getRandomNode = () =>
-        state.NodeGetter?.getRandomNode
-            ? state.NodeGetter.getRandomNode()
-            : {
-                  node: null,
-              }
+        state.NodeGetter?.getRandomNode ? state.NodeGetter.getRandomNode() : null
 
     return { init, findPath, getRandomNode }
 }

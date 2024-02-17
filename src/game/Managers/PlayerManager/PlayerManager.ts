@@ -64,7 +64,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
 
-        const { node } = PathfindingManager.getRandomNode()
+        const node = PathfindingManager.getRandomNode()
 
         if (!node) return
 

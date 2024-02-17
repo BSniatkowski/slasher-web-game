@@ -6,8 +6,8 @@ import {
     TCreateArenaManager,
 } from './ArenaManager.types'
 import { createBoardManager } from './BoardManager/BoardManager'
-import { createEnemyManager } from './EnemiesManager/EnemyManager/EnemyManager'
-import { createEnemy } from './EnemiesManager/EnemyManager/helpers/createEnemy/createEnemy'
+import { createEnemyManager } from './EnemyManager/EnemyManager'
+import { createEnemy } from './EnemyManager/helpers/createEnemy/createEnemy'
 
 export const createArenaManager: TCreateArenaManager = ({
     ResourceTracker,

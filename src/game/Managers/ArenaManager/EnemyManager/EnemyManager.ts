@@ -1,7 +1,7 @@
 import { CylinderGeometry, MathUtils, Mesh, MeshBasicMaterial, Vector3 } from 'three'
 
-import { EAnimationTypes } from '../../../AnimationsManager/AnimationsManager.types'
-import { createMoveAlongPathAnimation } from '../../../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
+import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
+import { createMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
 import {
     TCreateEnemyManager,
     TEnemyManagerState,

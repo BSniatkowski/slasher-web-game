@@ -3,7 +3,7 @@ import { Mesh, Vector3 } from 'three'
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TAnimationManager } from '../AnimationsManager/AnimationsManager.types'
 import { TPathfindingManager } from '../PathfindingManager/PathfindingManager.types'
-import { IEnemy } from './EnemiesManager/EnemyManager/EnemyManager.types'
+import { IEnemy } from './EnemyManager/EnemyManager.types'
 
 export interface IArenaManagerState {
     maxEnemies: number

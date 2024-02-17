@@ -1,8 +1,8 @@
 import { Mesh, Vector3 } from 'three'
 
-import { TResourceTracker } from '../../../../ResourceTracker/ResourceTracker.types'
-import { TAnimationManager } from '../../../AnimationsManager/AnimationsManager.types'
-import { TPathfindingManager } from '../../../PathfindingManager/PathfindingManager.types'
+import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
+import { TAnimationManager } from '../../AnimationsManager/AnimationsManager.types'
+import { TPathfindingManager } from '../../PathfindingManager/PathfindingManager.types'
 import { EEnemyBehaviours, TEnemyStats } from './helpers/createEnemy/createEnemy.types'
 
 export type TUpdateBehaviour = (behaviour: EEnemyBehaviours) => void

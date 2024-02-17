@@ -19,7 +19,7 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const ResourceTracker = createResourceTracker(Scene)
 
-    const PathfindingManager = createPathfindingManager({ Scene, ResourceTracker })
+    const PathfindingManager = createPathfindingManager({ ResourceTracker })
 
     const AnimationManager = createAnimationManager()
 

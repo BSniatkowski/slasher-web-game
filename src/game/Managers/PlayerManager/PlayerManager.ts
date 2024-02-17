@@ -163,7 +163,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
     const init = () => {
         CameraManager.init()
-        PathfindingManager.init()
         initPlayer()
         initPathVisialization()
         InputsManager.init()

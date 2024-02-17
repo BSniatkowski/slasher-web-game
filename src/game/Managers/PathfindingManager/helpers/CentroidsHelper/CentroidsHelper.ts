@@ -4,7 +4,7 @@ import { TCentroidsHelper } from './CentroidsHelper.types'
 
 const isDev = import.meta.env.DEV
 
-export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, polygons }) => {
+export const CentroidsHelper: TCentroidsHelper = ({ ResourceTracker, polygons }) => {
     const centroids = []
 
     for (let graphPolygonIndex = 0; graphPolygonIndex < polygons.length; graphPolygonIndex += 3) {
@@ -57,7 +57,6 @@ export const CentroidsHelper: TCentroidsHelper = ({ Scene, ResourceTracker, poly
             id: `centroid${centroidIndex}`,
             resource: newCentroidMesh,
         })
-        Scene.add(newCentroidMesh)
     }
 
     return { centroids }

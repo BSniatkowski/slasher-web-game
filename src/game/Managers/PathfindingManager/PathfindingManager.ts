@@ -12,7 +12,7 @@ import {
     TFindPath,
 } from './PathfindingManager.types'
 
-export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, ResourceTracker }) => {
+export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTracker }) => {
     const state: IPathfindingManagerState = {
         graph: null,
         NodeChecker: null,
@@ -24,9 +24,9 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ Scene, Res
 
         if (!board) return
 
-        const { polygons } = PolygonsHelper({ Scene, ResourceTracker, board })
+        const { polygons } = PolygonsHelper({ ResourceTracker, board })
 
-        const { centroids } = CentroidsHelper({ Scene, ResourceTracker, polygons })
+        const { centroids } = CentroidsHelper({ ResourceTracker, polygons })
 
         const { graph } = GraphHelper({ centroids })
 

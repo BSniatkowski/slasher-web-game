@@ -1,4 +1,4 @@
-import { Scene, Vector3 } from 'three'
+import { Vector3 } from 'three'
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TGraph } from './helpers/GraphHelper/GraphHelper.types'
@@ -22,10 +22,8 @@ export type TFindPath = ({
 }
 
 export type TCreatePathfindingManager = ({
-    Scene,
     ResourceTracker,
 }: {
-    Scene: Scene
     ResourceTracker: TResourceTracker
 }) => {
     init: () => void

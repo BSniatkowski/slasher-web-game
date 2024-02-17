@@ -7,18 +7,6 @@ type TCreateSquare = (position: { x: number; y: number }) => Array<number>
 const createSquare: TCreateSquare = (position) => {
     const { x, y } = position
 
-    const bottomTriangle = [
-        x - 0.5,
-        y - 0.5,
-        0, // v0
-        x + 0.5,
-        y - 0.5,
-        0, // v1
-        x + 0.5,
-        y + 0.5,
-        0, // v2
-    ]
-
     const upperTriangle = [
         x + 0.5,
         y + 0.5,
@@ -29,6 +17,18 @@ const createSquare: TCreateSquare = (position) => {
         x - 0.5,
         y - 0.5,
         0, // v5
+    ]
+
+    const bottomTriangle = [
+        x - 0.5,
+        y - 0.5,
+        0, // v0
+        x + 0.5,
+        y - 0.5,
+        0, // v1
+        x + 0.5,
+        y + 0.5,
+        0, // v2
     ]
 
     return [...upperTriangle, ...bottomTriangle]

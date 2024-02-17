@@ -118,7 +118,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const destinationPosition = destination.clone()
 
-        const { path } = PathfindingManager.findPath({
+        const path = PathfindingManager.findPath({
             startPosition,
             destinationPosition,
         })

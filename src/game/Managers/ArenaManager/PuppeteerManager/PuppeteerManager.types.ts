@@ -7,6 +7,7 @@ import { IEnemy } from '../EnemyManager/EnemyManager.types'
 
 export interface IPuppeteerManagerState {
     enemies: Array<IEnemy>
+    closeEnemies: Array<IEnemy>
     lastPlayerPosition: Vector3 | null
     lastPlayerNode: string | null
 }

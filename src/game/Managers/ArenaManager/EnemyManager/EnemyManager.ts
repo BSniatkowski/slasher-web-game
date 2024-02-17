@@ -5,6 +5,7 @@ import {
     TEnemyManagerState,
     TInitEnemy,
     TMoveEnemy,
+    TSetEnemyPath,
 } from './EnemyManager.types'
 
 export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTracker }) => {
@@ -12,7 +13,10 @@ export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTr
         ...enemyStats,
         hp: enemyStats.maxHp,
         enemyMesh: null,
+        path: [],
     }
+
+    const getId = () => state.id
 
     const move: TMoveEnemy = (position) => {
         if (!state.enemyMesh) return
@@ -46,5 +50,11 @@ export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTr
 
     const speedGetter = () => state.movementSpeed
 
-    return { init, move, positionGetter, speedGetter }
+    const rangeGetter = () => state.range
+
+    const getPath = () => state.path
+
+    const setPath: TSetEnemyPath = (path) => (state.path = path)
+
+    return { getId, init, move, positionGetter, speedGetter, rangeGetter, getPath, setPath }
 }

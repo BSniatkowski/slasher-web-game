@@ -4,6 +4,7 @@ import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
 import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
+import { TFindNodeIdByPosition } from './helpers/NodeChecker/NodeChecker.types'
 import { createNodeGetter } from './helpers/NodeGetter/NodeGetter'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
@@ -37,15 +38,11 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
     }
 
     const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
-        if (!state.NodeChecker) return { path: [] }
+        if (!state.NodeChecker) return []
 
-        const startNodeId = state.NodeChecker.findNodeIdByPosition({
-            position: startPosition,
-        })
+        const startNodeId = state.NodeChecker.findNodeIdByPosition(startPosition)
 
-        const destinationNodeId = state.NodeChecker.findNodeIdByPosition({
-            position: destinationPosition,
-        })
+        const destinationNodeId = state.NodeChecker.findNodeIdByPosition(destinationPosition)
 
         if (!startNodeId || !destinationNodeId || !state.graph) {
             console.warn(
@@ -55,7 +52,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
                 state.graph,
             )
 
-            return { path: [startPosition, destinationPosition] }
+            return [startPosition, destinationPosition]
         }
 
         const { path } = GraphTraverse({
@@ -66,11 +63,16 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
             graph: state.graph,
         })
 
-        return { path }
+        return path
     }
 
     const getRandomNode = () =>
         state.NodeGetter?.getRandomNode ? state.NodeGetter.getRandomNode() : null
 
-    return { init, findPath, getRandomNode }
+    const getNodeIdByPosition: TFindNodeIdByPosition = (position) =>
+        state.NodeChecker?.findNodeIdByPosition
+            ? state.NodeChecker.findNodeIdByPosition(position)
+            : null
+
+    return { init, findPath, getRandomNode, getNodeIdByPosition }
 }

@@ -1,6 +1,12 @@
-import { Vector3 } from 'three'
-
 import { IGraphNode, TGraph } from '../GraphHelper/GraphHelper.types'
+
+export interface Point {
+    x: number
+    y: number
+    z?: number
+}
+
+export type TGetTwoDimensionalDistanceBetweenPoints = (pointA: Point, pointB: Point) => number
 
 export type TGraphTraverse = ({
     startPosition,
@@ -9,13 +15,13 @@ export type TGraphTraverse = ({
     destinationNodeId,
     graph,
 }: {
-    startPosition: Vector3
+    startPosition: Point
     startNodeId: string
-    destinationPosition: Vector3
+    destinationPosition: Point
     destinationNodeId: string
     graph: TGraph
 }) => {
-    path: Array<Vector3>
+    path: Array<Point>
 }
 
 export interface IGraphNodeCopy extends IGraphNode {

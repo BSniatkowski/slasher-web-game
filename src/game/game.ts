@@ -66,6 +66,7 @@ export const initializeGame: TInitializeGame = (ref) => {
         pause()
         PlayerManager.dispose()
         ResourceTracker.disposeAllResources()
+        PathfindingManager.dispose()
 
         Renderer.domElement.remove()
         Renderer.dispose()

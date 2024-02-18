@@ -9,15 +9,18 @@ export interface IPathfindingManagerState {
     graph: null | TGraph
     NodeChecker: null | TNodeChecker
     NodeGetter: null | TNodeGetter
+    WebWorkers: Array<{ id: string; instance: Worker; isInUse: boolean; que: number }>
 }
 
 export type TFindPath = ({
+    id,
     startPosition,
     destinationPosition,
 }: {
+    id: string
     startPosition: Vector3
     destinationPosition: Vector3
-}) => Array<Vector3>
+}) => Promise<Array<Vector3>>
 
 export type TCreatePathfindingManager = ({
     ResourceTracker,
@@ -28,6 +31,7 @@ export type TCreatePathfindingManager = ({
     findPath: TFindPath
     getRandomNode: TGetRandomNode
     getNodeIdByPosition: TFindNodeIdByPosition
+    dispose: () => void
 }
 
 export type TPathfindingManager = ReturnType<TCreatePathfindingManager>

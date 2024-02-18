@@ -71,27 +71,28 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 
             if (isDistanceToPlayerGreaterThanToAnotherEnemy) {
-                const pathFromEnemyToEnemy = PathfindingManager.findPath({
+                PathfindingManager.findPath({
+                    id: animationId,
                     startPosition: currentEnemyPosition,
                     destinationPosition: closestToPlayerEnemyPosition,
+                }).then((pathFromEnemyToEnemy) => {
+                    const path = [...pathFromEnemyToEnemy, ...closestToPlayerEnemy.getPath()]
+
+                    AnimationManager.clearAnimation(animationId)
+                    AnimationManager.addAnimation({
+                        id: animationId,
+                        type: EAnimationTypes.dynamic,
+                        callback: createMoveAlongPathAnimation({
+                            path,
+                            speedGetter: enemy.speedGetter,
+                            positionUpdate: enemy.move,
+                            internalPathSetter: enemy.setPath,
+                        }),
+                        isPossibleGetter: () => true,
+                        isEndedGetter: () =>
+                            distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                    })
                 })
-
-                const path = [...pathFromEnemyToEnemy, ...closestToPlayerEnemy.getPath()]
-
-                AnimationManager.clearAnimation(animationId)
-                AnimationManager.addAnimation({
-                    id: animationId,
-                    type: EAnimationTypes.dynamic,
-                    callback: createMoveAlongPathAnimation({
-                        path,
-                        speedGetter: enemy.speedGetter,
-                        positionUpdate: enemy.move,
-                        internalPathSetter: enemy.setPath,
-                    }),
-                    isPossibleGetter: () => true,
-                    isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
-                })
-
                 continue
             }
 
@@ -108,29 +109,30 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 previousPathNextPoint.distanceToSquared(state.lastPlayerPosition) <
                     currentEnemyPosition.distanceToSquared(state.lastPlayerPosition)
 
-            const path = PathfindingManager.findPath({
+            PathfindingManager.findPath({
+                id: animationId,
                 startPosition: isPossibleToExtend
                     ? previousPathDestinationPoint
                     : currentEnemyPosition,
                 destinationPosition: state.lastPlayerPosition,
-            })
+            }).then((path) => {
+                const finalPath = isPossibleToExtend
+                    ? [currentEnemyPosition, ...previousPath.slice(1, -1), ...path]
+                    : path
 
-            const finalPath = isPossibleToExtend
-                ? [currentEnemyPosition, ...previousPath.slice(1, -1), ...path]
-                : path
-
-            AnimationManager.clearAnimation(animationId)
-            AnimationManager.addAnimation({
-                id: animationId,
-                type: EAnimationTypes.dynamic,
-                callback: createMoveAlongPathAnimation({
-                    path: finalPath,
-                    speedGetter: enemy.speedGetter,
-                    positionUpdate: enemy.move,
-                    internalPathSetter: enemy.setPath,
-                }),
-                isPossibleGetter: () => true,
-                isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                AnimationManager.clearAnimation(animationId)
+                AnimationManager.addAnimation({
+                    id: animationId,
+                    type: EAnimationTypes.dynamic,
+                    callback: createMoveAlongPathAnimation({
+                        path: finalPath,
+                        speedGetter: enemy.speedGetter,
+                        positionUpdate: enemy.move,
+                        internalPathSetter: enemy.setPath,
+                    }),
+                    isPossibleGetter: () => true,
+                    isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                })
             })
         }
     }

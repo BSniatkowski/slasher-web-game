@@ -21,7 +21,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const createEnemies = () => {
-        const maxEnemies = Math.round(Math.random() * 9) + 1
+        const maxEnemies = Math.round(Math.random() * 49) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
             const enemyStats = createEnemy({ id: String(enemyIndex) })
@@ -86,6 +86,9 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                     isPossibleGetter: () => true,
                     isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
                 })
+
+                enemy.setPath(path)
+                continue
             }
 
             const pathFromEnemyToPlayer = PathfindingManager.findPath({
@@ -103,8 +106,10 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                     positionUpdate: enemy.move,
                 }),
                 isPossibleGetter: () => true,
-                isEndedGetter: () => false,
+                isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
             })
+
+            enemy.setPath(pathFromEnemyToPlayer)
         }
     }
 
@@ -118,7 +123,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 .positionGetter()
                 ?.distanceToSquared(state.lastPlayerPosition)
 
-            if (distanceToPlayer && distanceToPlayer <= 10)
+            if (distanceToPlayer && distanceToPlayer <= 30)
                 closeEnemies.push({ distanceToPlayer, enemy })
         }
 

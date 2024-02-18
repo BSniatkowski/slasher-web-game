@@ -21,7 +21,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const createEnemies = () => {
-        const maxEnemies = Math.round(Math.random() * 49) + 1
+        const maxEnemies = Math.round(Math.random() * 25) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
             const enemyStats = createEnemy({ id: String(enemyIndex) })
@@ -46,15 +46,19 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     const moveEnemies = () => {
         const closestToPlayerEnemy = state.closeEnemies[0]
 
-        const closestToPlayerEnemyPosition = closestToPlayerEnemy?.positionGetter()
+        const closestToPlayerEnemyPositionRaw = closestToPlayerEnemy?.positionGetter()
 
-        if (!state.lastPlayerPosition || !closestToPlayerEnemy || !closestToPlayerEnemyPosition)
+        if (!state.lastPlayerPosition || !closestToPlayerEnemy || !closestToPlayerEnemyPositionRaw)
             return
 
-        for (const enemy of state.closeEnemies) {
-            const currentEnemyPosition = enemy.positionGetter()
+        const closestToPlayerEnemyPosition = closestToPlayerEnemyPositionRaw.clone().setZ(0)
 
-            if (!currentEnemyPosition) continue
+        for (const enemy of state.closeEnemies) {
+            const currentEnemyPositionRaw = enemy.positionGetter()
+
+            if (!currentEnemyPositionRaw) continue
+
+            const currentEnemyPosition = currentEnemyPositionRaw.clone().setZ(0)
 
             const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceToSquared(
                 state.lastPlayerPosition,
@@ -82,34 +86,52 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                         path,
                         speedGetter: enemy.speedGetter,
                         positionUpdate: enemy.move,
+                        internalPathSetter: enemy.setPath,
                     }),
                     isPossibleGetter: () => true,
                     isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
                 })
 
-                enemy.setPath(path)
                 continue
             }
 
-            const pathFromEnemyToPlayer = PathfindingManager.findPath({
-                startPosition: currentEnemyPosition,
+            const previousPath = enemy.getPath()
+
+            const previousPathNextPoint = previousPath[1]
+            const previousPathDestinationPoint = previousPath[previousPath.length - 1]
+
+            const isPossibleToExtend =
+                previousPath.length > 0 &&
+                previousPathNextPoint &&
+                currentEnemyPosition.distanceToSquared(state.lastPlayerPosition) >
+                    previousPathDestinationPoint.distanceToSquared(state.lastPlayerPosition) &&
+                previousPathNextPoint.distanceToSquared(state.lastPlayerPosition) <
+                    currentEnemyPosition.distanceToSquared(state.lastPlayerPosition)
+
+            const path = PathfindingManager.findPath({
+                startPosition: isPossibleToExtend
+                    ? previousPathDestinationPoint
+                    : currentEnemyPosition,
                 destinationPosition: state.lastPlayerPosition,
             })
+
+            const finalPath = isPossibleToExtend
+                ? [currentEnemyPosition, ...previousPath.slice(1, -1), ...path]
+                : path
 
             AnimationManager.clearAnimation(animationId)
             AnimationManager.addAnimation({
                 id: animationId,
                 type: EAnimationTypes.dynamic,
                 callback: createMoveAlongPathAnimation({
-                    path: pathFromEnemyToPlayer,
+                    path: finalPath,
                     speedGetter: enemy.speedGetter,
                     positionUpdate: enemy.move,
+                    internalPathSetter: enemy.setPath,
                 }),
                 isPossibleGetter: () => true,
                 isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
             })
-
-            enemy.setPath(pathFromEnemyToPlayer)
         }
     }
 
@@ -149,7 +171,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
         if (!player || state.lastPlayerPosition?.equals(player.position)) return
 
-        state.lastPlayerPosition = player.position.clone()
+        state.lastPlayerPosition = player.position.clone().setZ(0)
 
         checkAndUpdateLastPlayerNode(player.position)
     }

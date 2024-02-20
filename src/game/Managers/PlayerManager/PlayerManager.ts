@@ -170,9 +170,11 @@ export const createPlayerManager: TCreatePlayerManager = ({
         InputsManager.init()
     }
 
+    const tick = () => {}
+
     const dispose = () => {
         InputsManager.disposeControls()
     }
 
-    return { init, dispose }
+    return { init, tick, dispose }
 }

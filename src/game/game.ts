@@ -48,14 +48,14 @@ export const initializeGame: TInitializeGame = (ref) => {
         PlayerManager.init()
     }
 
-    const animate: TAnimate = () => {
+    const animate: TAnimate = async () => {
         if (generalState.isPaused) return
 
-        ArenaManager.tick()
+        await ArenaManager.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)
 
-        requestAnimationFrame(animate)
+        await new Promise(requestAnimationFrame).then(animate)
     }
 
     const pause: TPause = () => {

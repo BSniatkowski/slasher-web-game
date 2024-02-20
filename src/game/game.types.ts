@@ -1,6 +1,6 @@
 import { MutableRefObject } from 'react'
 
-export type TAnimate = () => void
+export type TAnimate = () => Promise<void>
 export type TPause = () => void
 export type TDispose = () => void
 

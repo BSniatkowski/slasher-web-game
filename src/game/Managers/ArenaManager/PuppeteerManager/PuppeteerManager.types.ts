@@ -22,5 +22,5 @@ export type TCreatePuppeteerManager = ({
     AnimationManager: TAnimationManager
 }) => {
     init: () => void
-    tick: () => void
+    tick: () => Promise<void>
 }

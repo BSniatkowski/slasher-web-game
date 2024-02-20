@@ -13,7 +13,7 @@ export type TCreateArenaManager = ({
 }) => {
     generateBoard: () => void
     populate: () => void
-    tick: () => void
+    tick: () => Promise<void>
 }
 
 export type TArenaManager = ReturnType<TCreateArenaManager>

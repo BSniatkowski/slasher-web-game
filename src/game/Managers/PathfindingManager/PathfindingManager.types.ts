@@ -5,11 +5,17 @@ import { TGraph } from './helpers/GraphHelper/GraphHelper.types'
 import { TFindNodeIdByPosition, TNodeChecker } from './helpers/NodeChecker/NodeChecker.types'
 import { TGetRandomNode, TNodeGetter } from './helpers/NodeGetter/NodeGetter.types'
 
+export interface IWebWorker {
+    id: string
+    instance: Worker
+    que: Array<{ id: string; resolve: () => void }>
+}
+
 export interface IPathfindingManagerState {
     graph: null | TGraph
     NodeChecker: null | TNodeChecker
     NodeGetter: null | TNodeGetter
-    WebWorkers: Array<{ id: string; instance: Worker; isInUse: boolean; que: number }>
+    WebWorkers: Array<IWebWorker>
 }
 
 export type TFindPath = ({

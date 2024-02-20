@@ -8,6 +8,7 @@ import { createNodeGetter } from './helpers/NodeGetter/NodeGetter'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
     IPathfindingManagerState,
+    IWebWorker,
     TCreatePathfindingManager,
     TFindPath,
 } from './PathfindingManager.types'
@@ -30,19 +31,29 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
             : 1
 
         for (let webWorkerIndex = 0; webWorkerIndex < webWorkersCount; webWorkerIndex++) {
-            const WebWorker = new Worker(
+            const instance = new Worker(
                 new URL('./helpers/GraphTraverse/GraphTraverse.webworker.ts', import.meta.url),
                 {
                     type: 'module',
                 },
             )
 
-            WebWorkers.push({
+            const WebWorker: IWebWorker = {
                 id: `${WEB_WORKER}${webWorkerIndex}`,
-                instance: WebWorker,
-                isInUse: false,
-                que: 0,
-            })
+                instance,
+                que: [],
+            }
+
+            WebWorker.instance.onmessage = (event) => {
+                const quedItem = WebWorker.que.find(({ id }) => id === event.data.id)
+
+                if (!quedItem) return
+
+                quedItem.resolve(event.data.path)
+                WebWorker.que = WebWorker.que.filter(({ id }) => id !== quedItem.id)
+            }
+
+            WebWorkers.push(WebWorker)
         }
 
         return WebWorkers
@@ -66,41 +77,13 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         state.WebWorkers = initWebWorkers()
     }
 
-    const addToWebWorkerQue = (pathData, promiseResolve) => {
-        state.WebWorkers.sort((workerA, workerB) => workerA.que - workerB.que)
+    const delegateToWebWorker = (pathData, resolve) => {
+        state.WebWorkers.sort((workerA, workerB) => workerA.que.length - workerB.que.length)
 
-        const theLeastQuedWebWorker = state.WebWorkers[0]
+        const theLeastOccupiedWebWorker = state.WebWorkers[0]
 
-        theLeastQuedWebWorker.instance.onmessage = (event) => {
-            promiseResolve(event.data)
-
-            theLeastQuedWebWorker.que--
-            if (theLeastQuedWebWorker.que === 0) theLeastQuedWebWorker.isInUse = false
-        }
-
-        theLeastQuedWebWorker.que++
-        theLeastQuedWebWorker.instance.postMessage(pathData)
-    }
-
-    const delegateToWebWorker = (pathData, promiseResolve) => {
-        console.log(JSON.parse(JSON.stringify(state.WebWorkers)))
-
-        const AvailableWebWorker = state.WebWorkers.find(({ isInUse }) => !isInUse)
-
-        if (!AvailableWebWorker) {
-            addToWebWorkerQue(pathData, promiseResolve)
-            return
-        }
-
-        AvailableWebWorker.isInUse = true
-
-        AvailableWebWorker.instance.onmessage = (event) => {
-            promiseResolve(event.data)
-
-            AvailableWebWorker.isInUse = false
-        }
-
-        AvailableWebWorker.instance.postMessage(pathData)
+        theLeastOccupiedWebWorker.que.push({ id: pathData.id, resolve })
+        theLeastOccupiedWebWorker.instance.postMessage(pathData)
     }
 
     const findPath: TFindPath = ({ id, startPosition, destinationPosition }) => {
@@ -131,13 +114,11 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
                     destinationNodeId,
                     graph: state.graph,
                 },
-                (event) => {
-                    if (event.id !== id) return
-
+                (rawPath) => {
                     const path = []
 
-                    if (event?.path) {
-                        for (const point of event.path) {
+                    if (rawPath) {
+                        for (const point of rawPath) {
                             path.push(new Vector3(point.x, point.y, point.z ?? 0))
                         }
 

@@ -1,3 +1,5 @@
+const isDev = import.meta.env.DEV
+
 import { Mesh, Vector3 } from 'three'
 
 import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
@@ -96,27 +98,25 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         theLeastOccupiedWebWorker.instance.postMessage(pathData)
     }
 
-    // @ts-expect-error Something is still missing in types because it infers it as Promise<value> | value instead of just first one
-    // TODO - It needs further research and types fix
     const findPath: TFindPath = ({ id, startPosition, destinationPosition }) => {
-        if (!state.NodeChecker) return []
+        const startNodeId = state.NodeChecker?.findNodeIdByPosition(startPosition)
 
-        const startNodeId = state.NodeChecker.findNodeIdByPosition(startPosition)
-
-        const destinationNodeId = state.NodeChecker.findNodeIdByPosition(destinationPosition)
-
-        if (!startNodeId || !destinationNodeId || !state.graph) {
-            console.warn(
-                'Something went wrong and pathfinding is not possible!',
-                startNodeId,
-                destinationNodeId,
-                state.graph,
-            )
-
-            return [startPosition, destinationPosition]
-        }
+        const destinationNodeId = state.NodeChecker?.findNodeIdByPosition(destinationPosition)
 
         return new Promise((resolve) => {
+            if (!startNodeId || !destinationNodeId || !state.graph) {
+                if (isDev)
+                    console.warn(
+                        'Something went wrong and pathfinding is not possible!',
+                        startNodeId,
+                        destinationNodeId,
+                        state.graph,
+                    )
+
+                resolve([startPosition, destinationPosition])
+                return
+            }
+
             delegateToWebWorker(
                 {
                     type: 'calculate',

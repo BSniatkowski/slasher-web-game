@@ -21,7 +21,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const createEnemies = () => {
-        const maxEnemies = Math.round(Math.random() * 25) + 1
+        const maxEnemies = Math.round(Math.random() * 49) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
             const enemyStats = createEnemy({ id: String(enemyIndex) })

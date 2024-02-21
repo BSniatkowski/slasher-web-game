@@ -2,14 +2,28 @@ import { Vector3 } from 'three'
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TGraph } from './helpers/GraphHelper/GraphHelper.types'
+import { IWebWorkerCalculatePathData, Point } from './helpers/GraphTraverse/GraphTraverse.types'
 import { TFindNodeIdByPosition, TNodeChecker } from './helpers/NodeChecker/NodeChecker.types'
 import { TGetRandomNode, TNodeGetter } from './helpers/NodeGetter/NodeGetter.types'
 
+type TWebWorkerResolve = (path: Array<Point>) => void
 export interface IWebWorker {
     id: string
     instance: Worker
-    que: Array<{ id: string; resolve: () => void }>
+    que: Array<{ id: string; resolve: TWebWorkerResolve }>
 }
+
+export interface IWebWorkerOnRespondMessageEvent {
+    data: {
+        id: string
+        path: Array<Point>
+    }
+}
+
+export type TDelegateToWebWorker = (
+    pathData: IWebWorkerCalculatePathData,
+    resolve: TWebWorkerResolve,
+) => void
 
 export interface IPathfindingManagerState {
     graph: null | TGraph

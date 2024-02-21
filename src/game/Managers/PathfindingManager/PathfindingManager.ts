@@ -9,7 +9,9 @@ import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
     IPathfindingManagerState,
     IWebWorker,
+    IWebWorkerOnRespondMessageEvent,
     TCreatePathfindingManager,
+    TDelegateToWebWorker,
     TFindPath,
 } from './PathfindingManager.types'
 
@@ -23,12 +25,18 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         WebWorkers: [],
     }
 
+    const disposeWebWorker = () => {
+        for (const WebWorker of state.WebWorkers) {
+            if (WebWorker?.instance) WebWorker.instance.terminate()
+        }
+    }
+
     const initWebWorkers = () => {
+        disposeWebWorker()
+
         const WebWorkers = []
 
-        const webWorkersCount = navigator?.hardwareConcurrency
-            ? navigator.hardwareConcurrency - 1
-            : 1
+        const webWorkersCount = navigator?.hardwareConcurrency ? navigator.hardwareConcurrency : 1
 
         for (let webWorkerIndex = 0; webWorkerIndex < webWorkersCount; webWorkerIndex++) {
             const instance = new Worker(
@@ -44,7 +52,9 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
                 que: [],
             }
 
-            WebWorker.instance.onmessage = (event) => {
+            WebWorker.instance.postMessage({ type: 'init', graph: state.graph })
+
+            WebWorker.instance.onmessage = (event: IWebWorkerOnRespondMessageEvent) => {
                 const quedItem = WebWorker.que.find(({ id }) => id === event.data.id)
 
                 if (!quedItem) return
@@ -77,7 +87,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         state.WebWorkers = initWebWorkers()
     }
 
-    const delegateToWebWorker = (pathData, resolve) => {
+    const delegateToWebWorker: TDelegateToWebWorker = (pathData, resolve) => {
         state.WebWorkers.sort((workerA, workerB) => workerA.que.length - workerB.que.length)
 
         const theLeastOccupiedWebWorker = state.WebWorkers[0]
@@ -86,6 +96,8 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         theLeastOccupiedWebWorker.instance.postMessage(pathData)
     }
 
+    // @ts-expect-error Something is still missing in types because it infers it as Promise<value> | value instead of just first one
+    // TODO - It needs further research and types fix
     const findPath: TFindPath = ({ id, startPosition, destinationPosition }) => {
         if (!state.NodeChecker) return []
 
@@ -107,12 +119,12 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
         return new Promise((resolve) => {
             delegateToWebWorker(
                 {
+                    type: 'calculate',
                     id,
                     startPosition,
                     startNodeId,
                     destinationPosition,
                     destinationNodeId,
-                    graph: state.graph,
                 },
                 (rawPath) => {
                     const path = []
@@ -140,9 +152,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
             : null
 
     const dispose = () => {
-        for (const WebWorker of state.WebWorkers) {
-            if (WebWorker?.instance) WebWorker.instance.terminate()
-        }
+        disposeWebWorker()
     }
 
     return { init, findPath, getRandomNode, getNodeIdByPosition, dispose }

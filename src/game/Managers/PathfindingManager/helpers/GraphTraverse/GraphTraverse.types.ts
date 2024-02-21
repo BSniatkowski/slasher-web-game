@@ -33,6 +33,25 @@ export interface IGraphNodeCopy extends IGraphNode {
 
 export type TGraphCopy = Array<IGraphNodeCopy>
 
+export interface IWebWorkerState {
+    graph: null | TGraphCopy
+}
+
+export interface IWebWorkerCalculatePathData {
+    type: 'calculate'
+    id: string
+    startPosition: Point
+    startNodeId: string
+    destinationPosition: Point
+    destinationNodeId: string
+}
+
+export type TWebWorkerOnReceiveMessageEvent =
+    | { data: { type: 'init'; graph: TGraphCopy } }
+    | {
+          data: IWebWorkerCalculatePathData
+      }
+
 export type TCheckIfHasSameNodeDownPreviousNodes = (
     node: IGraphNodeCopy,
     directNeighborNodes: Array<IGraphNodeCopy>,

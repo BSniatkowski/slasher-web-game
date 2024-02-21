@@ -35,6 +35,7 @@ export type TCreatePlayerManager = ({
     AnimationManager: TAnimationManager
 }) => {
     init: () => void
+    tick: () => void
     dispose: () => void
 }
 

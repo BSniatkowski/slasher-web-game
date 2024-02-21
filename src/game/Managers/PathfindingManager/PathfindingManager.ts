@@ -1,23 +1,74 @@
-import { Mesh } from 'three'
+const isDev = import.meta.env.DEV
+
+import { Mesh, Vector3 } from 'three'
 
 import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
-import { GraphTraverse } from './helpers/GraphTraverse/GraphTraverse'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
 import { TFindNodeIdByPosition } from './helpers/NodeChecker/NodeChecker.types'
 import { createNodeGetter } from './helpers/NodeGetter/NodeGetter'
 import { PolygonsHelper } from './helpers/PolygonsHelper/PolygonsHelper'
 import {
     IPathfindingManagerState,
+    IWebWorker,
+    IWebWorkerOnRespondMessageEvent,
     TCreatePathfindingManager,
+    TDelegateToWebWorker,
     TFindPath,
 } from './PathfindingManager.types'
+
+const WEB_WORKER = 'web_worker'
 
 export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTracker }) => {
     const state: IPathfindingManagerState = {
         graph: null,
         NodeChecker: null,
         NodeGetter: null,
+        WebWorkers: [],
+    }
+
+    const disposeWebWorker = () => {
+        for (const WebWorker of state.WebWorkers) {
+            if (WebWorker?.instance) WebWorker.instance.terminate()
+        }
+    }
+
+    const initWebWorkers = () => {
+        disposeWebWorker()
+
+        const WebWorkers = []
+
+        const webWorkersCount = navigator?.hardwareConcurrency ? navigator.hardwareConcurrency : 1
+
+        for (let webWorkerIndex = 0; webWorkerIndex < webWorkersCount; webWorkerIndex++) {
+            const instance = new Worker(
+                new URL('./helpers/GraphTraverse/GraphTraverse.webworker.ts', import.meta.url),
+                {
+                    type: 'module',
+                },
+            )
+
+            const WebWorker: IWebWorker = {
+                id: `${WEB_WORKER}${webWorkerIndex}`,
+                instance,
+                que: [],
+            }
+
+            WebWorker.instance.postMessage({ type: 'init', graph: state.graph })
+
+            WebWorker.instance.onmessage = (event: IWebWorkerOnRespondMessageEvent) => {
+                const quedItem = WebWorker.que.find(({ id }) => id === event.data.id)
+
+                if (!quedItem) return
+
+                quedItem.resolve(event.data.path)
+                WebWorker.que = WebWorker.que.filter(({ id }) => id !== quedItem.id)
+            }
+
+            WebWorkers.push(WebWorker)
+        }
+
+        return WebWorkers
     }
 
     const init = () => {
@@ -35,35 +86,61 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
 
         state.NodeChecker = createNodeChecker({ graph })
         state.NodeGetter = createNodeGetter({ graph })
+        state.WebWorkers = initWebWorkers()
     }
 
-    const findPath: TFindPath = ({ startPosition, destinationPosition }) => {
-        if (!state.NodeChecker) return []
+    const delegateToWebWorker: TDelegateToWebWorker = (pathData, resolve) => {
+        state.WebWorkers.sort((workerA, workerB) => workerA.que.length - workerB.que.length)
 
-        const startNodeId = state.NodeChecker.findNodeIdByPosition(startPosition)
+        const theLeastOccupiedWebWorker = state.WebWorkers[0]
 
-        const destinationNodeId = state.NodeChecker.findNodeIdByPosition(destinationPosition)
+        theLeastOccupiedWebWorker.que.push({ id: pathData.id, resolve })
+        theLeastOccupiedWebWorker.instance.postMessage(pathData)
+    }
 
-        if (!startNodeId || !destinationNodeId || !state.graph) {
-            console.warn(
-                'Something went wrong and pathfinding is not possible!',
-                startNodeId,
-                destinationNodeId,
-                state.graph,
+    const findPath: TFindPath = ({ id, startPosition, destinationPosition }) => {
+        const startNodeId = state.NodeChecker?.findNodeIdByPosition(startPosition)
+
+        const destinationNodeId = state.NodeChecker?.findNodeIdByPosition(destinationPosition)
+
+        return new Promise((resolve) => {
+            if (!startNodeId || !destinationNodeId || !state.graph) {
+                if (isDev)
+                    console.warn(
+                        'Something went wrong and pathfinding is not possible!',
+                        startNodeId,
+                        destinationNodeId,
+                        state.graph,
+                    )
+
+                resolve([startPosition, destinationPosition])
+                return
+            }
+
+            delegateToWebWorker(
+                {
+                    type: 'calculate',
+                    id,
+                    startPosition,
+                    startNodeId,
+                    destinationPosition,
+                    destinationNodeId,
+                },
+                (rawPath) => {
+                    const path = []
+
+                    if (rawPath) {
+                        for (const point of rawPath) {
+                            path.push(new Vector3(point.x, point.y, point.z ?? 0))
+                        }
+
+                        resolve(path)
+                    }
+
+                    resolve([startPosition, destinationPosition])
+                },
             )
-
-            return [startPosition, destinationPosition]
-        }
-
-        const { path } = GraphTraverse({
-            startPosition,
-            startNodeId,
-            destinationPosition,
-            destinationNodeId,
-            graph: state.graph,
         })
-
-        return path
     }
 
     const getRandomNode = () =>
@@ -74,5 +151,9 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
             ? state.NodeChecker.findNodeIdByPosition(position)
             : null
 
-    return { init, findPath, getRandomNode, getNodeIdByPosition }
+    const dispose = () => {
+        disposeWebWorker()
+    }
+
+    return { init, findPath, getRandomNode, getNodeIdByPosition, dispose }
 }

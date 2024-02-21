@@ -28,8 +28,10 @@ export type TCreateMoveAlongPathAnimation = ({
     path,
     speedGetter,
     positionUpdate,
+    internalPathSetter,
 }: {
     path: Array<Vector3>
     speedGetter: () => number
     positionUpdate: (position: Vector3) => void
+    internalPathSetter?: (path: Array<Vector3>) => void
 }) => () => void

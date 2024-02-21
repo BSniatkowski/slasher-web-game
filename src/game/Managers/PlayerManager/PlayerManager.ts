@@ -13,6 +13,7 @@ import {
     Vector3,
 } from 'three'
 
+import { PLAYER_MOVE } from '../../consts/animations.consts'
 import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
 import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
 import { createCameraManager } from './CameraManager/CameraManager'
@@ -101,7 +102,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         state.pathMesh.updateMatrix()
     }
 
-    const goToPosition = () => {
+    const goToPosition = async () => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
         const board = ResourceTracker.getTrackedResource('board')
@@ -118,7 +119,8 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const destinationPosition = destination.clone()
 
-        const path = PathfindingManager.findPath({
+        const path = await PathfindingManager.findPath({
+            id: PLAYER_MOVE,
             startPosition,
             destinationPosition,
         })
@@ -168,9 +170,11 @@ export const createPlayerManager: TCreatePlayerManager = ({
         InputsManager.init()
     }
 
+    const tick = () => {}
+
     const dispose = () => {
         InputsManager.disposeControls()
     }
 
-    return { init, dispose }
+    return { init, tick, dispose }
 }

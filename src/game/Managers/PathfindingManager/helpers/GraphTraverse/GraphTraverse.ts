@@ -1,9 +1,8 @@
-import { Vector3 } from 'three'
-
 import {
     IGraphNodeCopy,
     TCheckIfHasSameNodeDownPreviousNodes,
     TGetPathFromDestinationNode,
+    TGetTwoDimensionalDistanceBetweenPoints,
     TGraphCopy,
     TGraphTraverse,
     TSortFunc,
@@ -26,6 +25,11 @@ const checkIfHasSameNodeDownPreviousNodes: TCheckIfHasSameNodeDownPreviousNodes 
     return false
 }
 
+const getTwoDimensionalDistanceBetweenPoints: TGetTwoDimensionalDistanceBetweenPoints = (
+    pointA,
+    pointB,
+) => Math.sqrt(Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2))
+
 export const GraphTraverse: TGraphTraverse = ({
     startPosition,
     startNodeId,
@@ -40,7 +44,10 @@ export const GraphTraverse: TGraphTraverse = ({
 
     const startNode: IGraphNodeCopy = {
         ...originalStartNode,
-        distance: originalDestinationNode.center.distanceTo(originalStartNode.center),
+        distance: getTwoDimensionalDistanceBetweenPoints(
+            originalDestinationNode.center,
+            originalStartNode.center,
+        ),
         neighborNodes: [],
         stepped: true,
     }
@@ -57,7 +64,10 @@ export const GraphTraverse: TGraphTraverse = ({
         if (graphNode.id !== startNodeId && graphNode.id !== destinationNodeId)
             graphCopy.push({
                 ...graphNode,
-                distance: destinationNode.center.distanceTo(graphNode.center),
+                distance: getTwoDimensionalDistanceBetweenPoints(
+                    destinationNode.center,
+                    graphNode.center,
+                ),
                 neighborNodes: [],
             })
     }
@@ -125,11 +135,11 @@ export const GraphTraverse: TGraphTraverse = ({
     const path = []
 
     for (const node of path2D) {
-        path.push(new Vector3(node.center.x, node.center.y))
+        path.push({ ...node.center })
     }
 
     path[0] = destinationPosition
-    path[path.length - 1] = startPosition.clone().setZ(0)
+    path[path.length - 1] = { ...startPosition, z: 0 }
     path.reverse()
 
     return { path }

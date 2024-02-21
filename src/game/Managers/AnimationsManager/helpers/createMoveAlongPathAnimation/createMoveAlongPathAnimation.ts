@@ -9,6 +9,7 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
     path,
     speedGetter,
     positionUpdate,
+    internalPathSetter,
 }) => {
     const state: IMoveAlongPathAnimationState = {
         pathCopy: [],
@@ -81,6 +82,9 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
         state.distanceTraveled += nextMoveProps.currentSpeed
 
         positionUpdate(nextPosition)
+
+        if (typeof internalPathSetter === 'function')
+            internalPathSetter(state.pathCopy.slice(nextMoveProps.distanceIndex))
     }
 
     return callback

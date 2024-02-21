@@ -43,16 +43,15 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
         createEnemies()
     }
 
-    const moveEnemies = () => {
-        const closestToPlayerEnemy = state.closeEnemies[0]
+    const moveEnemies = async () => {
+        if (!state.lastPlayerPosition) return
 
-        const closestToPlayerEnemyPosition = closestToPlayerEnemy?.positionGetter()
+        const pathfindingPromises: Array<Promise<void>> = []
 
-        if (!state.lastPlayerPosition || !closestToPlayerEnemy || !closestToPlayerEnemyPosition)
-            return
+        for (let enemyIndex = 0; enemyIndex < state.closeEnemies.length; enemyIndex++) {
+            const enemy = state.closeEnemies[enemyIndex]
 
-        for (const enemy of state.closeEnemies) {
-            const currentEnemyPosition = enemy.positionGetter()
+            const currentEnemyPosition = enemy.positionGetter()?.clone().setZ(0)
 
             if (!currentEnemyPosition) continue
 
@@ -60,55 +59,75 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 state.lastPlayerPosition,
             )
 
+            const closerToPlayerEnemy = enemyIndex !== 0 && state.closeEnemies[enemyIndex - 1]
+
+            const closerToPlayerEnemyPosition =
+                closerToPlayerEnemy && closerToPlayerEnemy?.positionGetter()?.clone()?.setZ(0)
+
             const isDistanceToPlayerGreaterThanToAnotherEnemy =
+                closerToPlayerEnemyPosition &&
                 distanceFromCurrentEnemyToPlayer >
-                closestToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
+                    closerToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
 
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 
             if (isDistanceToPlayerGreaterThanToAnotherEnemy) {
-                const pathFromEnemyToEnemy = PathfindingManager.findPath({
-                    startPosition: currentEnemyPosition,
-                    destinationPosition: closestToPlayerEnemyPosition,
-                })
+                pathfindingPromises.push(
+                    PathfindingManager.findPath({
+                        id: animationId,
+                        startPosition: currentEnemyPosition,
+                        destinationPosition: closerToPlayerEnemyPosition,
+                    }).then((pathFromEnemyToEnemy) => {
+                        const path = [...pathFromEnemyToEnemy, ...closerToPlayerEnemy.getPath()]
 
-                const path = [...pathFromEnemyToEnemy, ...closestToPlayerEnemy.getPath()]
-
-                AnimationManager.clearAnimation(animationId)
-                AnimationManager.addAnimation({
-                    id: animationId,
-                    type: EAnimationTypes.dynamic,
-                    callback: createMoveAlongPathAnimation({
-                        path,
-                        speedGetter: enemy.speedGetter,
-                        positionUpdate: enemy.move,
+                        AnimationManager.clearAnimation(animationId)
+                        AnimationManager.addAnimation({
+                            id: animationId,
+                            type: EAnimationTypes.dynamic,
+                            callback: createMoveAlongPathAnimation({
+                                path,
+                                speedGetter: enemy.speedGetter,
+                                positionUpdate: enemy.move,
+                                internalPathSetter: enemy.setPath,
+                            }),
+                            isPossibleGetter: () => true,
+                            isEndedGetter: () =>
+                                distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                        })
                     }),
-                    isPossibleGetter: () => true,
-                    isEndedGetter: () => distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
-                })
+                )
+
+                continue
             }
 
-            const pathFromEnemyToPlayer = PathfindingManager.findPath({
-                startPosition: currentEnemyPosition,
-                destinationPosition: state.lastPlayerPosition,
-            })
-
-            AnimationManager.clearAnimation(animationId)
-            AnimationManager.addAnimation({
-                id: animationId,
-                type: EAnimationTypes.dynamic,
-                callback: createMoveAlongPathAnimation({
-                    path: pathFromEnemyToPlayer,
-                    speedGetter: enemy.speedGetter,
-                    positionUpdate: enemy.move,
+            pathfindingPromises.push(
+                PathfindingManager.findPath({
+                    id: animationId,
+                    startPosition: currentEnemyPosition,
+                    destinationPosition: state.lastPlayerPosition,
+                }).then((path) => {
+                    AnimationManager.clearAnimation(animationId)
+                    AnimationManager.addAnimation({
+                        id: animationId,
+                        type: EAnimationTypes.dynamic,
+                        callback: createMoveAlongPathAnimation({
+                            path,
+                            speedGetter: enemy.speedGetter,
+                            positionUpdate: enemy.move,
+                            internalPathSetter: enemy.setPath,
+                        }),
+                        isPossibleGetter: () => true,
+                        isEndedGetter: () =>
+                            distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                    })
                 }),
-                isPossibleGetter: () => true,
-                isEndedGetter: () => false,
-            })
+            )
         }
+
+        await Promise.all(pathfindingPromises)
     }
 
-    const checkAndUpdateCloseEnemies = () => {
+    const checkAndUpdateCloseEnemies = async () => {
         if (!state.lastPlayerPosition) return
 
         const closeEnemies = []
@@ -118,7 +137,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 .positionGetter()
                 ?.distanceToSquared(state.lastPlayerPosition)
 
-            if (distanceToPlayer && distanceToPlayer <= 10)
+            if (distanceToPlayer && distanceToPlayer <= 50)
                 closeEnemies.push({ distanceToPlayer, enemy })
         }
 
@@ -126,31 +145,31 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
         state.closeEnemies = closeEnemies.map(({ enemy }) => enemy)
 
-        moveEnemies()
+        await moveEnemies()
     }
 
-    const checkAndUpdateLastPlayerNode = (position: Vector3) => {
+    const checkAndUpdateLastPlayerNode = async (position: Vector3) => {
         const playerNode = PathfindingManager.getNodeIdByPosition(position)
 
         if (!playerNode || state.lastPlayerNode === playerNode) return
 
-        checkAndUpdateCloseEnemies()
+        await checkAndUpdateCloseEnemies()
 
         state.lastPlayerNode = playerNode
     }
 
-    const checkAndUpdateLastPlayerPosition = () => {
+    const checkAndUpdateLastPlayerPosition = async () => {
         const player = ResourceTracker.getTrackedResource(PLAYER)
 
         if (!player || state.lastPlayerPosition?.equals(player.position)) return
 
-        state.lastPlayerPosition = player.position.clone()
+        state.lastPlayerPosition = player.position.clone().setZ(0)
 
-        checkAndUpdateLastPlayerNode(player.position)
+        await checkAndUpdateLastPlayerNode(player.position)
     }
 
-    const tick = () => {
-        checkAndUpdateLastPlayerPosition()
+    const tick = async () => {
+        await checkAndUpdateLastPlayerPosition()
     }
 
     return { init, tick }

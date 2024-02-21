@@ -1,6 +1,12 @@
-import { Vector3 } from 'three'
-
 import { IGraphNode, TGraph } from '../GraphHelper/GraphHelper.types'
+
+export interface Point {
+    x: number
+    y: number
+    z?: number
+}
+
+export type TGetTwoDimensionalDistanceBetweenPoints = (pointA: Point, pointB: Point) => number
 
 export type TGraphTraverse = ({
     startPosition,
@@ -9,13 +15,13 @@ export type TGraphTraverse = ({
     destinationNodeId,
     graph,
 }: {
-    startPosition: Vector3
+    startPosition: Point
     startNodeId: string
-    destinationPosition: Vector3
+    destinationPosition: Point
     destinationNodeId: string
     graph: TGraph
 }) => {
-    path: Array<Vector3>
+    path: Array<Point>
 }
 
 export interface IGraphNodeCopy extends IGraphNode {
@@ -26,6 +32,25 @@ export interface IGraphNodeCopy extends IGraphNode {
 }
 
 export type TGraphCopy = Array<IGraphNodeCopy>
+
+export interface IWebWorkerState {
+    graph: null | TGraphCopy
+}
+
+export interface IWebWorkerCalculatePathData {
+    type: 'calculate'
+    id: string
+    startPosition: Point
+    startNodeId: string
+    destinationPosition: Point
+    destinationNodeId: string
+}
+
+export type TWebWorkerOnReceiveMessageEvent =
+    | { data: { type: 'init'; graph: TGraphCopy } }
+    | {
+          data: IWebWorkerCalculatePathData
+      }
 
 export type TCheckIfHasSameNodeDownPreviousNodes = (
     node: IGraphNodeCopy,

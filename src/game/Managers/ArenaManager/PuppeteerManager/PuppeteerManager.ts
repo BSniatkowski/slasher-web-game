@@ -21,7 +21,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const createEnemies = () => {
-        const maxEnemies = Math.round(Math.random() * 49) + 1
+        const maxEnemies = Math.round(Math.random() * 9) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
             const enemyStats = createEnemy({ id: String(enemyIndex) })
@@ -44,31 +44,30 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const moveEnemies = async () => {
-        const closestToPlayerEnemy = state.closeEnemies[0]
-
-        const closestToPlayerEnemyPositionRaw = closestToPlayerEnemy?.positionGetter()
-
-        if (!state.lastPlayerPosition || !closestToPlayerEnemy || !closestToPlayerEnemyPositionRaw)
-            return
+        if (!state.lastPlayerPosition) return
 
         const pathfindingPromises: Array<Promise<void>> = []
 
-        const closestToPlayerEnemyPosition = closestToPlayerEnemyPositionRaw.clone().setZ(0)
+        for (let enemyIndex = 0; enemyIndex < state.closeEnemies.length; enemyIndex++) {
+            const enemy = state.closeEnemies[enemyIndex]
 
-        for (const enemy of state.closeEnemies) {
-            const currentEnemyPositionRaw = enemy.positionGetter()
+            const currentEnemyPosition = enemy.positionGetter()?.clone().setZ(0)
 
-            if (!currentEnemyPositionRaw) continue
-
-            const currentEnemyPosition = currentEnemyPositionRaw.clone().setZ(0)
+            if (!currentEnemyPosition) continue
 
             const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceToSquared(
                 state.lastPlayerPosition,
             )
 
+            const closerToPlayerEnemy = enemyIndex !== 0 && state.closeEnemies[enemyIndex - 1]
+
+            const closerToPlayerEnemyPosition =
+                closerToPlayerEnemy && closerToPlayerEnemy?.positionGetter()?.clone()?.setZ(0)
+
             const isDistanceToPlayerGreaterThanToAnotherEnemy =
+                closerToPlayerEnemyPosition &&
                 distanceFromCurrentEnemyToPlayer >
-                closestToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
+                    closerToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
 
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 
@@ -77,9 +76,9 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                     PathfindingManager.findPath({
                         id: animationId,
                         startPosition: currentEnemyPosition,
-                        destinationPosition: closestToPlayerEnemyPosition,
+                        destinationPosition: closerToPlayerEnemyPosition,
                     }).then((pathFromEnemyToEnemy) => {
-                        const path = [...pathFromEnemyToEnemy, ...closestToPlayerEnemy.getPath()]
+                        const path = [...pathFromEnemyToEnemy, ...closerToPlayerEnemy.getPath()]
 
                         AnimationManager.clearAnimation(animationId)
                         AnimationManager.addAnimation({
@@ -101,37 +100,18 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 continue
             }
 
-            const previousPath = enemy.getPath()
-
-            const previousPathNextPoint = previousPath[1]
-            const previousPathDestinationPoint = previousPath[previousPath.length - 1]
-
-            const isPossibleToExtend =
-                previousPath.length > 0 &&
-                previousPathNextPoint &&
-                currentEnemyPosition.distanceToSquared(state.lastPlayerPosition) >
-                    previousPathDestinationPoint.distanceToSquared(state.lastPlayerPosition) &&
-                previousPathNextPoint.distanceToSquared(state.lastPlayerPosition) <
-                    currentEnemyPosition.distanceToSquared(state.lastPlayerPosition)
-
             pathfindingPromises.push(
                 PathfindingManager.findPath({
                     id: animationId,
-                    startPosition: isPossibleToExtend
-                        ? previousPathDestinationPoint
-                        : currentEnemyPosition,
+                    startPosition: currentEnemyPosition,
                     destinationPosition: state.lastPlayerPosition,
                 }).then((path) => {
-                    const finalPath = isPossibleToExtend
-                        ? [currentEnemyPosition, ...previousPath.slice(1, -1), ...path]
-                        : path
-
                     AnimationManager.clearAnimation(animationId)
                     AnimationManager.addAnimation({
                         id: animationId,
                         type: EAnimationTypes.dynamic,
                         callback: createMoveAlongPathAnimation({
-                            path: finalPath,
+                            path,
                             speedGetter: enemy.speedGetter,
                             positionUpdate: enemy.move,
                             internalPathSetter: enemy.setPath,
@@ -157,7 +137,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                 .positionGetter()
                 ?.distanceToSquared(state.lastPlayerPosition)
 
-            if (distanceToPlayer && distanceToPlayer <= enemy.rangeGetter() * 10)
+            if (distanceToPlayer && distanceToPlayer <= 50)
                 closeEnemies.push({ distanceToPlayer, enemy })
         }
 

@@ -1,5 +1,6 @@
 import { IBoardState, TCreateBoardManager, TGenerateBoard } from './BoardManager.types'
 import { createBaseBoard } from './helpers/createBaseBoard/createBaseBoard'
+import { createBoardFeatures } from './helpers/createBoardFeatures/createBoardFeatures'
 import { createBoardModel } from './helpers/createBoardModel/createBoardModel'
 import { Walker } from './helpers/Walker/Walker'
 
@@ -21,9 +22,11 @@ export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => 
 
         const walkableBoard = Walker({ baseBoard, walkable: 0.1 })
 
-        state.board = walkableBoard
+        const boardWithFeatures = createBoardFeatures({ walkableBoard })
 
-        const boardModel = createBoardModel({ board: walkableBoard })
+        const boardModel = createBoardModel({ board: boardWithFeatures })
+
+        state.board = boardWithFeatures
 
         boardModel.matrixAutoUpdate = false
         boardModel.updateMatrix()

@@ -1,4 +1,5 @@
 import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
+import { TBoardArea } from './helpers/createBoardFeatures/createBoardFeatures.type'
 import { TBoardModel } from './helpers/createBoardModel/createBoardModel.type'
 
 export type TGenerateBoard = () => void
@@ -8,7 +9,7 @@ export type TCreateBoardManager = ({ ResourceTracker }: { ResourceTracker: TReso
 }
 
 export interface IBoardState {
-    board: Array<Array<boolean>>
+    board: Array<TBoardArea>
     boardModel: TBoardModel | null
 }
 

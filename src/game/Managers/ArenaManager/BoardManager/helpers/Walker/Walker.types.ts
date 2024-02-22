@@ -2,12 +2,12 @@ export type TWalker = ({
     baseBoard,
     walkable,
 }: {
-    baseBoard: Array<Array<boolean>>
+    baseBoard: Array<Array<number>>
     walkable: number
-}) => Array<Array<boolean>>
+}) => Array<Array<number>>
 
 export interface IWalkerState {
-    board: Array<Array<boolean>>
+    board: Array<Array<number>>
     maxX: number
     maxY: number
     actualPosition: {

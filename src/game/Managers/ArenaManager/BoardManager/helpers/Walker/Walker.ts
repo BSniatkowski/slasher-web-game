@@ -1,3 +1,4 @@
+import { EBoardAreaType } from '../createBoardFeatures/createBoardFeatures.type'
 import {
     IWalkerState,
     TCheckPositionOnBoard,
@@ -17,7 +18,7 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
     }
 
     if (
-        state.board?.[x - 1]?.[y] === false &&
+        state.board?.[x - 1]?.[y] === EBoardAreaType.empty &&
         !vacantPositions.find(
             (vacantPosition) => vacantPosition.x === x - 1 && vacantPosition.y === y,
         )
@@ -25,7 +26,7 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
         vacantPositions.push({ x: x - 1, y })
 
     if (
-        state.board?.[x]?.[y - 1] === false &&
+        state.board?.[x]?.[y - 1] === EBoardAreaType.empty &&
         !vacantPositions.find(
             (vacantPosition) => vacantPosition.x === x && vacantPosition.y === y - 1,
         )
@@ -33,7 +34,7 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
         vacantPositions.push({ x, y: y - 1 })
 
     if (
-        state.board?.[x + 1]?.[y] === false &&
+        state.board?.[x + 1]?.[y] === EBoardAreaType.empty &&
         !vacantPositions.find(
             (vacantPosition) => vacantPosition.x === x + 1 && vacantPosition.y === y,
         )
@@ -41,7 +42,7 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
         vacantPositions.push({ x: x + 1, y })
 
     if (
-        state.board?.[x]?.[y + 1] === false &&
+        state.board?.[x]?.[y + 1] === EBoardAreaType.empty &&
         !vacantPositions.find(
             (vacantPosition) => vacantPosition.x === x && vacantPosition.y === y + 1,
         )
@@ -52,7 +53,7 @@ const updateVacantPositions: TUpdateVacantPositions = (state, { x, y }) => {
 }
 
 const checkPositionOnBoard: TCheckPositionOnBoard = (state, { x, y }) => {
-    state.board[x][y] = true
+    state.board[x][y] = EBoardAreaType.square
     updateVacantPositions(state, { x, y })
 }
 

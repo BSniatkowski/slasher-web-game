@@ -122,37 +122,85 @@ const createTopRightNarrowedge: TCreateGeometry = (position) => {
 const createBottomRightNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const bottomTriangle = [
-        x - 0.5,
-        y - 0.5,
-        0, // v0
+    const upperTriangle = [
         x + 0.5,
         y - 0.5,
-        0, // v1
+        0, // v3,
         x + 0.5,
         y + 0.5,
-        0, // v2
+        0, // v4
+        x + 0.35,
+        y - 0.15,
+        0, // v5
     ]
 
-    return [...bottomTriangle]
+    const middleTriangle = [
+        x + 0.5,
+        y - 0.5,
+        0, // v3,
+        x + 0.35,
+        y - 0.15,
+        0, // v5
+        x + 0.15,
+        y - 0.35,
+        0, // v5
+    ]
+
+    const bottomTriangle = [
+        x + 0.5,
+        y - 0.5,
+        0, // v4
+        x + 0.15,
+        y - 0.35,
+        0, // v5
+        x - 0.5,
+        y - 0.5,
+        0, // v5
+    ]
+
+    return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 }
 
 const createBottomLeftNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
+    const upperTriangle = [
+        x - 0.5,
+        y + 0.5,
+        0, // v3,
+        x - 0.5,
+        y - 0.5,
+        0, // v4
+        x - 0.35,
+        y - 0.15,
+        0, // v5
+    ]
+
+    const middleTriangle = [
+        x - 0.5,
+        y - 0.5,
+        0, // v3,
+        x - 0.15,
+        y - 0.35,
+        0, // v5
+        x - 0.35,
+        y - 0.15,
+        0, // v5
+    ]
+
     const bottomTriangle = [
         x - 0.5,
         y - 0.5,
-        0, // v0
+        0, // v3,
         x + 0.5,
         y - 0.5,
-        0, // v1
-        x - 0.5,
-        y + 0.5,
-        0, // v2
+        0, // v3,
+        x - 0.15,
+        y - 0.35,
+        0, // v5
     ]
 
-    return [...bottomTriangle]
+    return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 }
 
 export const createBoardModel: TCreateBoardModel = ({ board }) => {

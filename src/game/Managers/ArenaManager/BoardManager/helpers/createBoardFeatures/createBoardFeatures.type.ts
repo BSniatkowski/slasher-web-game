@@ -11,6 +11,10 @@ export enum EBoardAreaType {
     solidRightSquare,
     solidBottomSquare,
     solidLeftSquare,
+    smoothTopLeftSquare,
+    smoothTopRightSquare,
+    smoothBottomRightSquare,
+    smoothBottomLeftSquare,
 }
 
 export type TBoardArea = Point & { type: EBoardAreaType }

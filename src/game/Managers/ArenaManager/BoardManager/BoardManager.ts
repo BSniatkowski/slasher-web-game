@@ -24,9 +24,9 @@ export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => 
 
         const boardWithFeatures = createBoardFeatures({ walkableBoard })
 
-        const boardModel = createBoardModel({ board: boardWithFeatures })
-
         state.board = boardWithFeatures
+
+        const boardModel = createBoardModel({ board: boardWithFeatures })
 
         boardModel.matrixAutoUpdate = false
         boardModel.updateMatrix()

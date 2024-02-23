@@ -59,6 +59,14 @@ export const createBoardFeatures: TCreateBoardFeatures = ({ walkableBoard }) => 
         )
     }
 
+    const isOneOfSmooth = (type: EBoardAreaType) =>
+        [
+            EBoardAreaType.smoothBottomLeftSquare,
+            EBoardAreaType.smoothBottomRightSquare,
+            EBoardAreaType.smoothTopLeftSquare,
+            EBoardAreaType.smoothTopRightSquare,
+        ].includes(type)
+
     for (const area of boardWithFeatures) {
         if (area.type === EBoardAreaType.square) continue
 
@@ -139,6 +147,38 @@ export const createBoardFeatures: TCreateBoardFeatures = ({ walkableBoard }) => 
             areaOnRight === EBoardAreaType.empty
         )
             area.type = EBoardAreaType.solidBottomSquare
+
+        if (
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.empty &&
+            (areaBelow === EBoardAreaType.square || isOneOfSmooth(areaBelow)) &&
+            (areaOnRight === EBoardAreaType.square || isOneOfSmooth(areaOnRight))
+        )
+            area.type = EBoardAreaType.smoothTopLeftSquare
+
+        if (
+            areaAbove === EBoardAreaType.empty &&
+            (areaOnLeft === EBoardAreaType.square || isOneOfSmooth(areaOnLeft)) &&
+            (areaBelow === EBoardAreaType.square || isOneOfSmooth(areaBelow)) &&
+            areaOnRight === EBoardAreaType.empty
+        )
+            area.type = EBoardAreaType.smoothTopRightSquare
+
+        if (
+            (areaAbove === EBoardAreaType.square || isOneOfSmooth(areaAbove)) &&
+            (areaOnLeft === EBoardAreaType.square || isOneOfSmooth(areaOnLeft)) &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.empty
+        )
+            area.type = EBoardAreaType.smoothBottomRightSquare
+
+        if (
+            (areaAbove === EBoardAreaType.square || isOneOfSmooth(areaAbove)) &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.empty &&
+            (areaOnRight === EBoardAreaType.square || isOneOfSmooth(areaOnRight))
+        )
+            area.type = EBoardAreaType.smoothBottomLeftSquare
     }
 
     return boardWithFeatures

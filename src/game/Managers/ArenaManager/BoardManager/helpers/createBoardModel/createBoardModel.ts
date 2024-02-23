@@ -99,23 +99,15 @@ const createSolidSquare: TCreateGeometry = (position, rotation) => {
 const createSmoothSquare: TCreateGeometry = (position, rotation) => {
     const { x, y } = position
 
-    const upperTriangle = [x + 0.25, y + 0.5, 0, x - 0.5, y + 0.5, 0, x - 0.5, y - 0.5, 0]
+    const upperTriangle = [x + 0.5, y - 0.5, 0, x - 0.35, y - 0.15, 0, x - 0.15, y - 0.35, 0]
 
-    const bottomTriangle = [x - 0.5, y - 0.5, 0, x + 0.25, y - 0.5, 0, x + 0.25, y + 0.5, 0]
+    const middleTriangle = [x + 0.5, y - 0.5, 0, x - 0.5, y + 0.5, 0, x - 0.35, y - 0.15, 0]
 
-    const rightTopTriangle = [x + 0.25, y + 0.5, 0, x + 0.25, y - 0.5, 0, x + 0.5, y + 0.25, 0]
+    const bottomTriangle = [x - 0.5, y + 0.5, 0, x + 0.5, y - 0.5, 0, x + 0.5, y + 0.5, 0]
 
-    const rightBottomTriangle = [x + 0.5, y + 0.25, 0, x + 0.25, y - 0.5, 0, x + 0.5, y - 0.25, 0]
+    if (!rotation) return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 
-    if (!rotation)
-        return [...upperTriangle, ...bottomTriangle, ...rightTopTriangle, ...rightBottomTriangle]
-
-    return rotatePoints(
-        x,
-        y,
-        [...upperTriangle, ...bottomTriangle, ...rightTopTriangle, ...rightBottomTriangle],
-        rotation,
-    )
+    return rotatePoints(x, y, [...upperTriangle, ...middleTriangle, ...bottomTriangle], rotation)
 }
 
 export const createBoardModel: TCreateBoardModel = ({ board }) => {

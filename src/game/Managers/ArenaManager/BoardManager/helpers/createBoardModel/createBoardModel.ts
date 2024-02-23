@@ -8,29 +8,9 @@ type TCreateGeometry = (position: { x: number; y: number }) => Array<number>
 const createSquare: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const upperTriangle = [
-        x + 0.5,
-        y + 0.5,
-        0, // v3
-        x - 0.5,
-        y + 0.5,
-        0, // v4
-        x - 0.5,
-        y - 0.5,
-        0, // v5
-    ]
+    const upperTriangle = [x + 0.5, y + 0.5, 0, x - 0.5, y + 0.5, 0, x - 0.5, y - 0.5, 0]
 
-    const bottomTriangle = [
-        x - 0.5,
-        y - 0.5,
-        0, // v0
-        x + 0.5,
-        y - 0.5,
-        0, // v1
-        x + 0.5,
-        y + 0.5,
-        0, // v2
-    ]
+    const bottomTriangle = [x - 0.5, y - 0.5, 0, x + 0.5, y - 0.5, 0, x + 0.5, y + 0.5, 0]
 
     return [...upperTriangle, ...bottomTriangle]
 }
@@ -38,41 +18,11 @@ const createSquare: TCreateGeometry = (position) => {
 const createTopLeftNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const upperTriangle = [
-        x + 0.5,
-        y + 0.5,
-        0, // v3
-        x - 0.5,
-        y + 0.5,
-        0, // v4
-        x - 0.15,
-        y + 0.35,
-        0, // v5
-    ]
+    const upperTriangle = [x + 0.5, y + 0.5, 0, x - 0.5, y + 0.5, 0, x - 0.15, y + 0.35, 0]
 
-    const middleTriangle = [
-        x - 0.15,
-        y + 0.35,
-        0, // v3
-        x - 0.5,
-        y + 0.5,
-        0, // v4
-        x - 0.35,
-        y + 0.15,
-        0, // v5
-    ]
+    const middleTriangle = [x - 0.15, y + 0.35, 0, x - 0.5, y + 0.5, 0, x - 0.35, y + 0.15, 0]
 
-    const bottomTriangle = [
-        x - 0.35,
-        y + 0.15,
-        0, // v3
-        x - 0.5,
-        y + 0.5,
-        0, // v4
-        x - 0.5,
-        y - 0.5,
-        0, // v5
-    ]
+    const bottomTriangle = [x - 0.35, y + 0.15, 0, x - 0.5, y + 0.5, 0, x - 0.5, y - 0.5, 0]
 
     return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 }
@@ -80,41 +30,11 @@ const createTopLeftNarrowedge: TCreateGeometry = (position) => {
 const createTopRightNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const upperTriangle = [
-        x + 0.5,
-        y + 0.5,
-        0, // v4
-        x - 0.5,
-        y + 0.5,
-        0, // v3
-        x + 0.15,
-        y + 0.35,
-        0, // v5
-    ]
+    const upperTriangle = [x + 0.5, y + 0.5, 0, x - 0.5, y + 0.5, 0, x + 0.15, y + 0.35, 0]
 
-    const middleTriangle = [
-        x + 0.5,
-        y + 0.5,
-        0, // v3
-        x + 0.15,
-        y + 0.35,
-        0, // v4
-        x + 0.35,
-        y + 0.15,
-        0, // v5
-    ]
+    const middleTriangle = [x + 0.5, y + 0.5, 0, x + 0.15, y + 0.35, 0, x + 0.35, y + 0.15, 0]
 
-    const bottomTriangle = [
-        x + 0.5,
-        y + 0.5,
-        0, // v3
-        x + 0.35,
-        y + 0.15,
-        0, // v4
-        x + 0.5,
-        y - 0.5,
-        0, // v5
-    ]
+    const bottomTriangle = [x + 0.5, y + 0.5, 0, x + 0.35, y + 0.15, 0, x + 0.5, y - 0.5, 0]
 
     return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 }
@@ -122,41 +42,11 @@ const createTopRightNarrowedge: TCreateGeometry = (position) => {
 const createBottomRightNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const upperTriangle = [
-        x + 0.5,
-        y - 0.5,
-        0, // v3,
-        x + 0.5,
-        y + 0.5,
-        0, // v4
-        x + 0.35,
-        y - 0.15,
-        0, // v5
-    ]
+    const upperTriangle = [x + 0.5, y - 0.5, 0, x + 0.5, y + 0.5, 0, x + 0.35, y - 0.15, 0]
 
-    const middleTriangle = [
-        x + 0.5,
-        y - 0.5,
-        0, // v3,
-        x + 0.35,
-        y - 0.15,
-        0, // v5
-        x + 0.15,
-        y - 0.35,
-        0, // v5
-    ]
+    const middleTriangle = [x + 0.5, y - 0.5, 0, x + 0.35, y - 0.15, 0, x + 0.15, y - 0.35, 0]
 
-    const bottomTriangle = [
-        x + 0.5,
-        y - 0.5,
-        0, // v4
-        x + 0.15,
-        y - 0.35,
-        0, // v5
-        x - 0.5,
-        y - 0.5,
-        0, // v5
-    ]
+    const bottomTriangle = [x + 0.5, y - 0.5, 0, x + 0.15, y - 0.35, 0, x - 0.5, y - 0.5, 0]
 
     return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
 }
@@ -164,43 +54,27 @@ const createBottomRightNarrowedge: TCreateGeometry = (position) => {
 const createBottomLeftNarrowedge: TCreateGeometry = (position) => {
     const { x, y } = position
 
-    const upperTriangle = [
-        x - 0.5,
-        y + 0.5,
-        0, // v3,
-        x - 0.5,
-        y - 0.5,
-        0, // v4
-        x - 0.35,
-        y - 0.15,
-        0, // v5
-    ]
+    const upperTriangle = [x - 0.5, y + 0.5, 0, x - 0.5, y - 0.5, 0, x - 0.35, y - 0.15, 0]
 
-    const middleTriangle = [
-        x - 0.5,
-        y - 0.5,
-        0, // v3,
-        x - 0.15,
-        y - 0.35,
-        0, // v5
-        x - 0.35,
-        y - 0.15,
-        0, // v5
-    ]
+    const middleTriangle = [x - 0.5, y - 0.5, 0, x - 0.15, y - 0.35, 0, x - 0.35, y - 0.15, 0]
 
-    const bottomTriangle = [
-        x - 0.5,
-        y - 0.5,
-        0, // v3,
-        x + 0.5,
-        y - 0.5,
-        0, // v3,
-        x - 0.15,
-        y - 0.35,
-        0, // v5
-    ]
+    const bottomTriangle = [x - 0.5, y - 0.5, 0, x + 0.5, y - 0.5, 0, x - 0.15, y - 0.35, 0]
 
     return [...upperTriangle, ...middleTriangle, ...bottomTriangle]
+}
+
+const createSolidLeftSquare: TCreateGeometry = (position) => {
+    const { x, y } = position
+
+    const upperTriangle = [x + 0.25, y + 0.5, 0, x - 0.5, y + 0.5, 0, x - 0.5, y - 0.5, 0]
+
+    const bottomTriangle = [x - 0.5, y - 0.5, 0, x + 0.25, y - 0.5, 0, x + 0.25, y + 0.5, 0]
+
+    const rightTopTriangle = [x + 0.25, y + 0.5, 0, x + 0.25, y - 0.5, 0, x + 0.5, y + 0.25, 0]
+
+    const rightBottomTriangle = [x + 0.5, y + 0.25, 0, x + 0.25, y - 0.5, 0, x + 0.5, y - 0.25, 0]
+
+    return [...upperTriangle, ...bottomTriangle, ...rightTopTriangle, ...rightBottomTriangle]
 }
 
 export const createBoardModel: TCreateBoardModel = ({ board }) => {
@@ -225,6 +99,22 @@ export const createBoardModel: TCreateBoardModel = ({ board }) => {
                 break
             }
             case EBoardAreaType.bottomLeftNarrowedge: {
+                areas.push(...createBottomLeftNarrowedge(area))
+                break
+            }
+            case EBoardAreaType.solidLeftSquare: {
+                areas.push(...createSolidLeftSquare(area))
+                break
+            }
+            case EBoardAreaType.solidTopSquare: {
+                areas.push(...createTopRightNarrowedge(area))
+                break
+            }
+            case EBoardAreaType.solidRightSquare: {
+                areas.push(...createBottomRightNarrowedge(area))
+                break
+            }
+            case EBoardAreaType.solidBottomSquare: {
                 areas.push(...createBottomLeftNarrowedge(area))
                 break
             }

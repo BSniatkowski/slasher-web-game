@@ -27,8 +27,6 @@ export const createBoardFeatures: TCreateBoardFeatures = ({ walkableBoard }) => 
         }
     }
 
-    console.log(boardWithFeatures)
-
     const getAreaOnLeft = (area: TBoardArea) => {
         return (
             boardWithFeatures.find(
@@ -64,37 +62,83 @@ export const createBoardFeatures: TCreateBoardFeatures = ({ walkableBoard }) => 
     for (const area of boardWithFeatures) {
         if (area.type === EBoardAreaType.square) continue
 
+        const areaAbove = getAreaAbove(area)
+        const areaOnLeft = getAreaOnLeft(area)
+        const areaBelow = getAreaBelow(area)
+        const areaOnRight = getAreaOnRight(area)
+
         if (
-            getAreaAbove(area) === EBoardAreaType.square &&
-            getAreaOnLeft(area) === EBoardAreaType.square &&
-            getAreaBelow(area) === EBoardAreaType.empty &&
-            getAreaOnRight(area) === EBoardAreaType.empty
+            areaAbove === EBoardAreaType.square &&
+            areaOnLeft === EBoardAreaType.square &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.empty
         )
             area.type = EBoardAreaType.topLeftNarrowedge
 
         if (
-            getAreaAbove(area) === EBoardAreaType.square &&
-            getAreaOnLeft(area) === EBoardAreaType.empty &&
-            getAreaBelow(area) === EBoardAreaType.empty &&
-            getAreaOnRight(area) === EBoardAreaType.square
+            areaAbove === EBoardAreaType.square &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.square
         )
             area.type = EBoardAreaType.topRightNarrowedge
 
         if (
-            getAreaAbove(area) === EBoardAreaType.empty &&
-            getAreaOnLeft(area) === EBoardAreaType.square &&
-            getAreaBelow(area) === EBoardAreaType.square &&
-            getAreaOnRight(area) === EBoardAreaType.empty
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.square &&
+            areaBelow === EBoardAreaType.square &&
+            areaOnRight === EBoardAreaType.empty
         )
             area.type = EBoardAreaType.bottomLeftNarrowedge
 
         if (
-            getAreaAbove(area) === EBoardAreaType.empty &&
-            getAreaOnLeft(area) === EBoardAreaType.empty &&
-            getAreaBelow(area) === EBoardAreaType.square &&
-            getAreaOnRight(area) === EBoardAreaType.square
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.square &&
+            areaOnRight === EBoardAreaType.square
         )
             area.type = EBoardAreaType.bottomRightNarrowedge
+    }
+
+    for (const area of boardWithFeatures) {
+        if (area.type !== EBoardAreaType.square) continue
+
+        const areaAbove = getAreaAbove(area)
+        const areaOnLeft = getAreaOnLeft(area)
+        const areaBelow = getAreaBelow(area)
+        const areaOnRight = getAreaOnRight(area)
+
+        if (
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.square &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.empty
+        )
+            area.type = EBoardAreaType.solidLeftSquare
+
+        if (
+            areaAbove === EBoardAreaType.square &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.empty
+        )
+            area.type = EBoardAreaType.solidTopSquare
+
+        if (
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.empty &&
+            areaOnRight === EBoardAreaType.square
+        )
+            area.type = EBoardAreaType.solidRightSquare
+
+        if (
+            areaAbove === EBoardAreaType.empty &&
+            areaOnLeft === EBoardAreaType.empty &&
+            areaBelow === EBoardAreaType.square &&
+            areaOnRight === EBoardAreaType.empty
+        )
+            area.type = EBoardAreaType.solidBottomSquare
     }
 
     return boardWithFeatures

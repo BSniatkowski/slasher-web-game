@@ -8,10 +8,10 @@ import {
     Vector2,
 } from 'three'
 
-import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
-import { TAnimationManager } from '../AnimationsManager/AnimationsManager.types'
-import { TCollisionsManager } from '../CollisionsManager/CollisionsManager.types'
-import { TPathfindingManager } from '../PathfindingManager/PathfindingManager.types'
+import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
+import { TAnimationManager } from '../../AnimationsManager/AnimationsManager.types'
+import { TCollisionsManager } from '../../CollisionsManager/CollisionsManager.types'
+import { TPathfindingManager } from '../../PathfindingManager/PathfindingManager.types'
 
 export interface IPlayerManagerState {
     player: null | Mesh<CylinderGeometry, MeshBasicMaterial>

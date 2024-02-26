@@ -14,6 +14,7 @@ import {
 } from 'three'
 
 import { PLAYER_MOVE } from '../../consts/animations.consts'
+import { BOARD, PLAYER, PLAYER_PATH_VISUALIZATION } from '../../consts/objects.consts'
 import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
 import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
 import { createCameraManager } from './CameraManager/CameraManager'
@@ -26,6 +27,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     ResourceTracker,
     PathfindingManager,
     AnimationManager,
+    CollisionsManager,
 }) => {
     const state: IPlayerManagerState = {
         player: null,
@@ -63,7 +65,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         state.player = playerMesh
 
-        ResourceTracker.trackResource({ id: 'player', resource: playerMesh })
+        ResourceTracker.trackResource({ id: PLAYER, resource: playerMesh })
 
         const node = PathfindingManager.getRandomNode()
 
@@ -72,6 +74,11 @@ export const createPlayerManager: TCreatePlayerManager = ({
         const initialPosition = new Vector3(node.center.x, node.center.y)
 
         updatePlayerPosition(initialPosition)
+
+        CollisionsManager.addCollisionsItem({
+            id: PLAYER,
+            positionGetter: () => state.player?.position,
+        })
     }
 
     const initPathVisialization = () => {
@@ -92,7 +99,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         state.pathMesh = pathMesh
 
-        ResourceTracker.trackResource({ id: 'path', resource: pathMesh })
+        ResourceTracker.trackResource({ id: PLAYER_PATH_VISUALIZATION, resource: pathMesh })
     }
 
     const visualizePath = ({ path }: { path: Array<Vector3> }) => {
@@ -105,7 +112,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const goToPosition = async () => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
-        const board = ResourceTracker.getTrackedResource('board')
+        const board = ResourceTracker.getTrackedResource(BOARD)
 
         if (!board) return
 
@@ -127,7 +134,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         if (isDev && path) visualizePath({ path })
 
-        AnimationManager.clearAnimation('player_move')
+        AnimationManager.clearAnimation(PLAYER_MOVE)
 
         if (path.length === 0) return
 
@@ -141,7 +148,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
                 : true
 
         AnimationManager.addAnimation({
-            id: 'player_move',
+            id: PLAYER_MOVE,
             type: EAnimationTypes.dynamic,
             callback: createMoveAlongPathAnimation({
                 path,

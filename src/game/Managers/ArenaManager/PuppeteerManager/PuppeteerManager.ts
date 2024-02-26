@@ -5,23 +5,27 @@ import { PLAYER } from '../../../consts/objects.consts'
 import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
 import { createMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
 import { createEnemyManager } from '../EnemyManager/EnemyManager'
+import { IEnemy } from '../EnemyManager/EnemyManager.types'
 import { createEnemy } from '../EnemyManager/helpers/createEnemy/createEnemy'
 import { IPuppeteerManagerState, TCreatePuppeteerManager } from './PuppeteerManager.types'
+
+const closeEnemiesDistance = 5
 
 export const createPuppeteerManager: TCreatePuppeteerManager = ({
     ResourceTracker,
     PathfindingManager,
     AnimationManager,
+    CollisionsManager,
 }) => {
     const state: IPuppeteerManagerState = {
-        enemies: [],
+        enemies: null,
         closeEnemies: [],
         lastPlayerPosition: null,
         lastPlayerNode: null,
     }
 
     const createEnemies = () => {
-        const maxEnemies = Math.round(Math.random() * 9) + 1
+        const maxEnemies = Math.round(Math.random() * 49) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
             const enemyStats = createEnemy({ id: String(enemyIndex) })
@@ -35,11 +39,18 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (initialNode) enemy.init(new Vector3(initialNode.center.x, initialNode.center.y))
 
-            state.enemies.push(enemy)
+            if (state.enemies) state.enemies.set(String(enemyIndex), enemy)
+
+            CollisionsManager.addCollisionsItem({
+                id: String(enemyIndex),
+                positionGetter: enemy.positionGetter,
+            })
         }
     }
 
     const init = () => {
+        state.enemies = new Map()
+
         createEnemies()
     }
 
@@ -55,7 +66,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (!currentEnemyPosition) continue
 
-            const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceToSquared(
+            const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceTo(
                 state.lastPlayerPosition,
             )
 
@@ -67,7 +78,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
             const isDistanceToPlayerGreaterThanToAnotherEnemy =
                 closerToPlayerEnemyPosition &&
                 distanceFromCurrentEnemyToPlayer >
-                    closerToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
+                    closerToPlayerEnemyPosition.distanceTo(state.lastPlayerPosition)
 
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 
@@ -128,22 +139,37 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const checkAndUpdateCloseEnemies = async () => {
-        if (!state.lastPlayerPosition) return
+        if (!state.lastPlayerPosition || !state.enemies) return
 
-        const closeEnemies = []
-
-        for (const enemy of state.enemies) {
-            const distanceToPlayer = enemy
-                .positionGetter()
-                ?.distanceToSquared(state.lastPlayerPosition)
-
-            if (distanceToPlayer && distanceToPlayer <= 50)
-                closeEnemies.push({ distanceToPlayer, enemy })
+        const range = {
+            x: state.lastPlayerPosition.x,
+            y: state.lastPlayerPosition.y,
+            r: closeEnemiesDistance,
         }
 
-        closeEnemies.sort((enemyA, enemyB) => enemyA.distanceToPlayer - enemyB.distanceToPlayer)
+        const enemiesIds = CollisionsManager.findItemsInRange(range).map((enemy) => enemy.id)
 
-        state.closeEnemies = closeEnemies.map(({ enemy }) => enemy)
+        const closeEnemies: Array<{ distanceToPlayer: number; enemy: IEnemy }> = []
+
+        for (const enemyId of enemiesIds) {
+            const enemy = state.enemies.get(enemyId)
+
+            const enemyPosition = enemy && enemy.positionGetter()
+
+            if (enemy && enemyPosition) {
+                const distanceToPlayer = enemyPosition.distanceTo(state.lastPlayerPosition)
+
+                if (distanceToPlayer <= closeEnemiesDistance)
+                    closeEnemies.push({
+                        distanceToPlayer,
+                        enemy,
+                    })
+            }
+        }
+
+        state.closeEnemies = closeEnemies
+            .sort((enemyA, enemyB) => enemyA.distanceToPlayer - enemyB.distanceToPlayer)
+            .map(({ enemy }) => enemy)
 
         await moveEnemies()
     }

@@ -6,16 +6,21 @@ export const createArenaManager: TCreateArenaManager = ({
     ResourceTracker,
     PathfindingManager,
     AnimationManager,
+    CollisionsManager,
 }) => {
     const BoardManager = createBoardManager({ ResourceTracker })
+
     const PuppeteerManager = createPuppeteerManager({
         ResourceTracker,
         PathfindingManager,
         AnimationManager,
+        CollisionsManager,
     })
 
     const generateBoard = () => {
-        BoardManager.generateBoard()
+        const boundries = BoardManager.generateBoard()
+
+        CollisionsManager.updateBoardBoundries(boundries)
     }
 
     const populate = () => {

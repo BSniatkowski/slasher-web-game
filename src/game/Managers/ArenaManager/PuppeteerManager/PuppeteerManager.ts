@@ -66,7 +66,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (!currentEnemyPosition) continue
 
-            const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceTo(
+            const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceToSquared(
                 state.lastPlayerPosition,
             )
 
@@ -78,7 +78,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
             const isDistanceToPlayerGreaterThanToAnotherEnemy =
                 closerToPlayerEnemyPosition &&
                 distanceFromCurrentEnemyToPlayer >
-                    closerToPlayerEnemyPosition.distanceTo(state.lastPlayerPosition)
+                    closerToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
 
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 

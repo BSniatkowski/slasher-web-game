@@ -147,12 +147,12 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
             r: closeEnemiesDistance,
         }
 
-        const enemiesIds = CollisionsManager.findItemsInRange(range).map((enemy) => enemy.id)
+        const enemiesInRange = CollisionsManager.findItemsInRange(range)
 
         const closeEnemies: Array<{ distanceToPlayer: number; enemy: IEnemy }> = []
 
-        for (const enemyId of enemiesIds) {
-            const enemy = state.enemies.get(enemyId)
+        for (const enemyInRange of enemiesInRange) {
+            const enemy = state.enemies.get(enemyInRange.id)
 
             const enemyPosition = enemy && enemy.positionGetter()
 

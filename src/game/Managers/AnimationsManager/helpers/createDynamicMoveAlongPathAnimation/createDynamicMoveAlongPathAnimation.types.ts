@@ -24,7 +24,7 @@ export type TFindNextPosition = ({
     lerpAlpha: number
 }) => Vector3
 
-export type TCreateMoveAlongPathAnimation = ({
+export type TCreateDynamicMoveAlongPathAnimation = ({
     path,
     speedGetter,
     positionUpdate,

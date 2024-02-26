@@ -58,6 +58,7 @@ export const initializeGame: TInitializeGame = (ref) => {
 
         CollisionsManager.tick()
         await ArenaManager.tick()
+        await PlayerManager.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)
 

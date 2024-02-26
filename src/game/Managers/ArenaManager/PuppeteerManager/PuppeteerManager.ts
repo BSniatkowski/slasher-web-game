@@ -3,7 +3,7 @@ import { Vector3 } from 'three'
 import { ENEMY_MOVE } from '../../../consts/animations.consts'
 import { PLAYER } from '../../../consts/objects.consts'
 import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
-import { createMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
+import { createDynamicMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
 import { createEnemyManager } from '../EnemyManager/EnemyManager'
 import { IEnemy } from '../EnemyManager/EnemyManager.types'
 import { createEnemy } from '../EnemyManager/helpers/createEnemy/createEnemy'
@@ -95,7 +95,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                         AnimationManager.addAnimation({
                             id: animationId,
                             type: EAnimationTypes.dynamic,
-                            callback: createMoveAlongPathAnimation({
+                            callback: createDynamicMoveAlongPathAnimation({
                                 path,
                                 speedGetter: enemy.speedGetter,
                                 positionUpdate: enemy.move,
@@ -121,7 +121,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                     AnimationManager.addAnimation({
                         id: animationId,
                         type: EAnimationTypes.dynamic,
-                        callback: createMoveAlongPathAnimation({
+                        callback: createDynamicMoveAlongPathAnimation({
                             path,
                             speedGetter: enemy.speedGetter,
                             positionUpdate: enemy.move,

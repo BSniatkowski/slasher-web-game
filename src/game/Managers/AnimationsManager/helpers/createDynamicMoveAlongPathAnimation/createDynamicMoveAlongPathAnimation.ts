@@ -1,11 +1,11 @@
 import {
     IMoveAlongPathAnimationState,
-    TCreateMoveAlongPathAnimation,
+    TCreateDynamicMoveAlongPathAnimation,
     TFindLerpBetweenPathPoints,
     TFindNextPosition,
-} from './createMoveAlongPathAnimation.types'
+} from './createDynamicMoveAlongPathAnimation.types'
 
-export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
+export const createDynamicMoveAlongPathAnimation: TCreateDynamicMoveAlongPathAnimation = ({
     path,
     speedGetter,
     positionUpdate,
@@ -22,7 +22,7 @@ export const createMoveAlongPathAnimation: TCreateMoveAlongPathAnimation = ({
 
         if (pointIndex === path.length - 1) break
 
-        state.pathDistances.push(path[pointIndex].manhattanDistanceTo(path[pointIndex + 1]))
+        state.pathDistances.push(path[pointIndex].distanceTo(path[pointIndex + 1]))
     }
 
     const findNextPathPartIndexAndMinDistance = () => {

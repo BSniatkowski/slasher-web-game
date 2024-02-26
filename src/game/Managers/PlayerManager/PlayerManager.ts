@@ -16,7 +16,7 @@ import {
 import { PLAYER_MOVE } from '../../consts/animations.consts'
 import { BOARD, PLAYER, PLAYER_PATH_VISUALIZATION } from '../../consts/objects.consts'
 import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
-import { createMoveAlongPathAnimation } from '../AnimationsManager/helpers/createMoveAlongPathAnimation/createMoveAlongPathAnimation'
+import { createDynamicMoveAlongPathAnimation } from '../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
@@ -34,6 +34,8 @@ export const createPlayerManager: TCreatePlayerManager = ({
         pointer: new Vector2(),
         raycaster: new Raycaster(),
         pathMesh: null,
+        isRightClickPressed: false,
+        isRightClickPressedDelay: 0,
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
@@ -150,7 +152,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
         AnimationManager.addAnimation({
             id: PLAYER_MOVE,
             type: EAnimationTypes.dynamic,
-            callback: createMoveAlongPathAnimation({
+            callback: createDynamicMoveAlongPathAnimation({
                 path,
                 speedGetter: () => 0.025,
                 positionUpdate: updatePlayerPosition,
@@ -160,12 +162,18 @@ export const createPlayerManager: TCreatePlayerManager = ({
         })
     }
 
+    const setIsRightClickPressed = (pressed: boolean) => {
+        state.isRightClickPressed = pressed
+    }
+
     const InputsManager = createInputsManager({
         ref,
         keybindings: {
-            click: goToPosition,
-            contextmenu: goToPosition,
-            touchdown: goToPosition,
+            contextmenu: (event) => event.preventDefault(),
+            mousedown: () => setIsRightClickPressed(true),
+            mouseup: () => setIsRightClickPressed(false),
+            touchdown: () => setIsRightClickPressed(true),
+            touchup: () => setIsRightClickPressed(true),
             pointermove: (event) => updatePointer(event as PointerEvent),
         },
     })
@@ -177,7 +185,19 @@ export const createPlayerManager: TCreatePlayerManager = ({
         InputsManager.init()
     }
 
-    const tick = () => {}
+    const tick = async () => {
+        if (state.isRightClickPressed) {
+            state.isRightClickPressedDelay++
+
+            if (state.isRightClickPressedDelay > 5) {
+                await goToPosition()
+            }
+
+            return
+        }
+
+        state.isRightClickPressedDelay = 0
+    }
 
     const dispose = () => {
         InputsManager.disposeControls()

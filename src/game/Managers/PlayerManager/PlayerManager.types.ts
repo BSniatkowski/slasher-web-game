@@ -18,6 +18,8 @@ export interface IPlayerManagerState {
     pointer: Vector2
     raycaster: Raycaster
     pathMesh: null | Line
+    isRightClickPressed: boolean
+    isRightClickPressedDelay: number
 }
 
 export type TUpdatePointer = (event: PointerEvent) => void

@@ -5,7 +5,6 @@ import { createAnimationManager } from './Managers/AnimationsManager/AnimationsM
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
 import { createCollisionsManager } from './Managers/CollisionsManager/CollisionsManager'
 import { createPathfindingManager } from './Managers/PathfindingManager/PathfindingManager'
-import { createPlayerManager } from './Managers/PlayerManager/PlayerManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 
 export const initializeGame: TInitializeGame = (ref) => {
@@ -26,16 +25,9 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const CollisionsManager = createCollisionsManager()
 
-    const PlayerManager = createPlayerManager({
+    const ArenaManager = createArenaManager({
         ref: Renderer.domElement,
         Camera,
-        ResourceTracker,
-        PathfindingManager,
-        AnimationManager,
-        CollisionsManager,
-    })
-
-    const ArenaManager = createArenaManager({
         ResourceTracker,
         PathfindingManager,
         AnimationManager,
@@ -50,7 +42,6 @@ export const initializeGame: TInitializeGame = (ref) => {
         ArenaManager.generateBoard()
         PathfindingManager.init()
         ArenaManager.populate()
-        PlayerManager.init()
     }
 
     const animate: TAnimate = async () => {
@@ -58,7 +49,6 @@ export const initializeGame: TInitializeGame = (ref) => {
 
         CollisionsManager.tick()
         await ArenaManager.tick()
-        await PlayerManager.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)
 
@@ -71,7 +61,6 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const dispose: TDispose = () => {
         pause()
-        PlayerManager.dispose()
         ResourceTracker.disposeAllResources()
         PathfindingManager.dispose()
 

@@ -1,14 +1,26 @@
 import { TCreateArenaManager } from './ArenaManager.types'
 import { createBoardManager } from './BoardManager/BoardManager'
+import { createPlayerManager } from './PlayerManager/PlayerManager'
 import { createPuppeteerManager } from './PuppeteerManager/PuppeteerManager'
 
 export const createArenaManager: TCreateArenaManager = ({
+    ref,
+    Camera,
     ResourceTracker,
     PathfindingManager,
     AnimationManager,
     CollisionsManager,
 }) => {
     const BoardManager = createBoardManager({ ResourceTracker })
+
+    const PlayerManager = createPlayerManager({
+        ref,
+        Camera,
+        ResourceTracker,
+        PathfindingManager,
+        AnimationManager,
+        CollisionsManager,
+    })
 
     const PuppeteerManager = createPuppeteerManager({
         ResourceTracker,
@@ -24,8 +36,18 @@ export const createArenaManager: TCreateArenaManager = ({
     }
 
     const populate = () => {
+        PlayerManager.init()
         PuppeteerManager.init()
     }
 
-    return { generateBoard, populate, tick: PuppeteerManager.tick }
+    const tick = async () => {
+        await PlayerManager.tick()
+        await PuppeteerManager.tick()
+    }
+
+    const dispose = () => {
+        PlayerManager.dispose()
+    }
+
+    return { generateBoard, populate, tick, dispose }
 }

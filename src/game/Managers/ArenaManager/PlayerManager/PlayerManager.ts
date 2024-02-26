@@ -13,10 +13,10 @@ import {
     Vector3,
 } from 'three'
 
-import { PLAYER_MOVE } from '../../consts/animations.consts'
-import { BOARD, PLAYER, PLAYER_PATH_VISUALIZATION } from '../../consts/objects.consts'
-import { EAnimationTypes } from '../AnimationsManager/AnimationsManager.types'
-import { createDynamicMoveAlongPathAnimation } from '../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
+import { PLAYER_MOVE } from '../../../consts/animations.consts'
+import { BOARD, PLAYER, PLAYER_PATH_VISUALIZATION } from '../../../consts/objects.consts'
+import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
+import { createDynamicMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
@@ -61,7 +61,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         const playerMesh = new Mesh(geometry, material)
         playerMesh.matrixAutoUpdate = false
-        playerMesh.renderOrder = 3
+        playerMesh.renderOrder = 4
 
         playerMesh.rotateX(MathUtils.degToRad(90))
 

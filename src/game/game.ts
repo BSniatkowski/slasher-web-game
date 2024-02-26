@@ -3,6 +3,7 @@ import { PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from 'three'
 import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
 import { createAnimationManager } from './Managers/AnimationsManager/AnimationsManager'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
+import { createCollisionsManager } from './Managers/CollisionsManager/CollisionsManager'
 import { createPathfindingManager } from './Managers/PathfindingManager/PathfindingManager'
 import { createPlayerManager } from './Managers/PlayerManager/PlayerManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
@@ -23,18 +24,22 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     const AnimationManager = createAnimationManager()
 
+    const CollisionsManager = createCollisionsManager()
+
     const PlayerManager = createPlayerManager({
         ref: Renderer.domElement,
         Camera,
         ResourceTracker,
         PathfindingManager,
         AnimationManager,
+        CollisionsManager,
     })
 
     const ArenaManager = createArenaManager({
         ResourceTracker,
         PathfindingManager,
         AnimationManager,
+        CollisionsManager,
     })
 
     const generalState = {
@@ -51,6 +56,7 @@ export const initializeGame: TInitializeGame = (ref) => {
     const animate: TAnimate = async () => {
         if (generalState.isPaused) return
 
+        CollisionsManager.tick()
         await ArenaManager.tick()
         AnimationManager.animate()
         Renderer.render(Scene, Camera)

@@ -34,6 +34,8 @@ export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => 
         state.boardModel = boardModel
 
         ResourceTracker.trackResource({ id: 'board', resource: boardModel })
+
+        return { x: -0.5, y: -0.5, w: maxSize.x + 1, h: maxSize.y + 1 } // TODO - correct first points at model creating to remove those -0.5
     }
 
     return { generateBoard }

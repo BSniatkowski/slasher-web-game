@@ -10,6 +10,7 @@ import {
 
 import { TResourceTracker } from '../../ResourceTracker/ResourceTracker.types'
 import { TAnimationManager } from '../AnimationsManager/AnimationsManager.types'
+import { TCollisionsManager } from '../CollisionsManager/CollisionsManager.types'
 import { TPathfindingManager } from '../PathfindingManager/PathfindingManager.types'
 
 export interface IPlayerManagerState {
@@ -27,12 +28,14 @@ export type TCreatePlayerManager = ({
     ResourceTracker,
     PathfindingManager,
     AnimationManager,
+    CollisionsManager,
 }: {
     ref: HTMLCanvasElement
     Camera: PerspectiveCamera
     ResourceTracker: TResourceTracker
     PathfindingManager: TPathfindingManager
     AnimationManager: TAnimationManager
+    CollisionsManager: TCollisionsManager
 }) => {
     init: () => void
     tick: () => void

@@ -117,6 +117,11 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
                 return
             }
 
+            if (startNodeId === destinationNodeId) {
+                resolve([startPosition, destinationPosition])
+                return
+            }
+
             delegateToWebWorker(
                 {
                     type: 'calculate',
@@ -133,6 +138,8 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
                         for (const point of rawPath) {
                             path.push(new Vector3(point.x, point.y, point.z ?? 0))
                         }
+
+                        path.push(destinationPosition)
 
                         resolve(path)
                     }

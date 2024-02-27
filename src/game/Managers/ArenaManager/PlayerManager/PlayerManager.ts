@@ -36,6 +36,8 @@ export const createPlayerManager: TCreatePlayerManager = ({
         pathMesh: null,
         isRightClickPressed: false,
         isRightClickPressedDelay: 0,
+        range: 5,
+        enemiesInRange: [],
     }
 
     const CameraManager = createCameraManager({ Camera, playerManagerState: state })
@@ -185,13 +187,33 @@ export const createPlayerManager: TCreatePlayerManager = ({
         InputsManager.init()
     }
 
+    const updateEnemiesInRange = () => {
+        if (!state.player?.position) return
+
+        const range = {
+            x: state.player?.position.x,
+            y: state.player?.position.y,
+            r: state.range,
+        }
+
+        state.enemiesInRange = CollisionsManager.findItemsInRange(range)
+    }
+
+    const createProjectile = () => {
+
+    }
+
+    const attack = () => {
+
+    } 
+
     const tick = async () => {
+        updateEnemiesInRange()
+
         if (state.isRightClickPressed) {
             state.isRightClickPressedDelay++
 
-            if (state.isRightClickPressedDelay > 5) {
-                await goToPosition()
-            }
+            if (state.isRightClickPressedDelay > 5) await goToPosition()
 
             return
         }

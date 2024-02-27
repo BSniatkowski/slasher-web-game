@@ -10,7 +10,7 @@ import {
 
 import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
 import { TAnimationManager } from '../../AnimationsManager/AnimationsManager.types'
-import { TCollisionsManager } from '../../CollisionsManager/CollisionsManager.types'
+import { ICollisionItem, TCollisionsManager } from '../../CollisionsManager/CollisionsManager.types'
 import { TPathfindingManager } from '../../PathfindingManager/PathfindingManager.types'
 
 export interface IPlayerManagerState {
@@ -20,6 +20,8 @@ export interface IPlayerManagerState {
     pathMesh: null | Line
     isRightClickPressed: boolean
     isRightClickPressedDelay: number
+    range: number
+    enemiesInRange: Array<ICollisionItem>
 }
 
 export type TUpdatePointer = (event: PointerEvent) => void
@@ -40,7 +42,7 @@ export type TCreatePlayerManager = ({
     CollisionsManager: TCollisionsManager
 }) => {
     init: () => void
-    tick: () => void
+    tick: () => Promise<void>
     dispose: () => void
 }
 

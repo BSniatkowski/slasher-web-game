@@ -28,7 +28,9 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
         const maxEnemies = Math.round(Math.random() * 49) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
-            const enemyStats = createEnemy({ id: String(enemyIndex) })
+            const id = crypto.randomUUID()
+
+            const enemyStats = createEnemy({ id })
 
             const enemy = createEnemyManager({
                 enemyStats,
@@ -39,10 +41,10 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (initialNode) enemy.init(new Vector3(initialNode.center.x, initialNode.center.y))
 
-            if (state.enemies) state.enemies.set(String(enemyIndex), enemy)
+            if (state.enemies) state.enemies.set(id, enemy)
 
             CollisionsManager.addCollisionsItem({
-                id: String(enemyIndex),
+                id,
                 positionGetter: enemy.positionGetter,
             })
         }
@@ -66,50 +68,9 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (!currentEnemyPosition) continue
 
-            const distanceFromCurrentEnemyToPlayer = currentEnemyPosition.distanceToSquared(
-                state.lastPlayerPosition,
-            )
-
-            const closerToPlayerEnemy = enemyIndex !== 0 && state.closeEnemies[enemyIndex - 1]
-
-            const closerToPlayerEnemyPosition =
-                closerToPlayerEnemy && closerToPlayerEnemy?.positionGetter()?.clone()?.setZ(0)
-
-            const isDistanceToPlayerGreaterThanToAnotherEnemy =
-                closerToPlayerEnemyPosition &&
-                distanceFromCurrentEnemyToPlayer >
-                    closerToPlayerEnemyPosition.distanceToSquared(state.lastPlayerPosition)
-
             const animationId = `${ENEMY_MOVE}${enemy.getId()}`
 
-            if (isDistanceToPlayerGreaterThanToAnotherEnemy) {
-                pathfindingPromises.push(
-                    PathfindingManager.findPath({
-                        id: animationId,
-                        startPosition: currentEnemyPosition,
-                        destinationPosition: closerToPlayerEnemyPosition,
-                    }).then((pathFromEnemyToEnemy) => {
-                        const path = [...pathFromEnemyToEnemy, ...closerToPlayerEnemy.getPath()]
-
-                        AnimationManager.clearAnimation(animationId)
-                        AnimationManager.addAnimation({
-                            id: animationId,
-                            type: EAnimationTypes.dynamic,
-                            callback: createDynamicMoveAlongPathAnimation({
-                                path,
-                                speedGetter: enemy.speedGetter,
-                                positionUpdate: enemy.move,
-                                internalPathSetter: enemy.setPath,
-                            }),
-                            isPossibleGetter: () => true,
-                            isEndedGetter: () =>
-                                distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
-                        })
-                    }),
-                )
-
-                continue
-            }
+            const isPossibleGetter = () => true
 
             pathfindingPromises.push(
                 PathfindingManager.findPath({
@@ -127,9 +88,8 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
                             positionUpdate: enemy.move,
                             internalPathSetter: enemy.setPath,
                         }),
-                        isPossibleGetter: () => true,
-                        isEndedGetter: () =>
-                            distanceFromCurrentEnemyToPlayer <= enemy.rangeGetter(),
+                        isPossibleGetter,
+                        isEndedGetter: () => enemy.getPath()?.length === 0,
                     })
                 }),
             )
@@ -187,7 +147,9 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     const checkAndUpdateLastPlayerPosition = async () => {
         const player = ResourceTracker.getTrackedResource(PLAYER)
 
-        if (!player || state.lastPlayerPosition?.equals(player.position)) return
+        if (!player || state.lastPlayerPosition?.equals(player.position)) {
+            return
+        }
 
         state.lastPlayerPosition = player.position.clone().setZ(0)
 

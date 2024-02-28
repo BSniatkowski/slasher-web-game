@@ -87,10 +87,20 @@ export const createAnimationManager = () => {
     const clearAllEndedAnimations = () => {
         state.animations = state.animations.filter((animation) => {
             switch (animation.type) {
-                case EAnimationTypes.simple:
-                    return animation.tick < animation.ticksDuration
-                case EAnimationTypes.dynamic:
-                    return !animation.isEndedGetter()
+                case EAnimationTypes.simple: {
+                    const isNotEnded = animation.tick < animation.ticksDuration
+
+                    if (!isNotEnded && typeof animation.onEnded === 'function') animation.onEnded()
+
+                    return isNotEnded
+                }
+                case EAnimationTypes.dynamic: {
+                    const isNotEnded = !animation.isEndedGetter()
+
+                    if (!isNotEnded && typeof animation.onEnded === 'function') animation.onEnded()
+
+                    return isNotEnded
+                }
             }
         })
     }

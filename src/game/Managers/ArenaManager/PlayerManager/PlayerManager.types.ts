@@ -1,12 +1,4 @@
-import {
-    CylinderGeometry,
-    Line,
-    Mesh,
-    MeshBasicMaterial,
-    PerspectiveCamera,
-    Raycaster,
-    Vector2,
-} from 'three'
+import { Line, Mesh, PerspectiveCamera, Raycaster, Vector2 } from 'three'
 
 import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types'
 import { TAnimationManager } from '../../AnimationsManager/AnimationsManager.types'
@@ -15,7 +7,7 @@ import { TPathfindingManager } from '../../PathfindingManager/PathfindingManager
 import { TAttacksManager } from '../AttacksManager/AttacksManager.types'
 
 export interface IPlayerManagerState {
-    player: null | Mesh<CylinderGeometry, MeshBasicMaterial>
+    player: null | Mesh
     pointer: Vector2
     raycaster: Raycaster
     pathMesh: null | Line

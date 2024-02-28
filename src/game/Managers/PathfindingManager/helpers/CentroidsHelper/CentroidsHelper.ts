@@ -1,8 +1,9 @@
+const isDev = import.meta.env.DEV
+const showDebugHelpers = import.meta.env.SHOW_DEBUG_HELPERS as boolean
+
 import { CircleGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three'
 
 import { TCentroidsHelper } from './CentroidsHelper.types'
-
-const isDev = import.meta.env.DEV
 
 export const CentroidsHelper: TCentroidsHelper = ({ ResourceTracker, polygons }) => {
     const centroids = []
@@ -30,7 +31,7 @@ export const CentroidsHelper: TCentroidsHelper = ({ ResourceTracker, polygons })
         })
     }
 
-    if (!isDev) return { centroids }
+    if (!isDev || !showDebugHelpers) return { centroids }
 
     const centroidGeometry = new CircleGeometry(0.05, 12)
     const centroidMaterial = new MeshBasicMaterial({

@@ -1,7 +1,3 @@
-const isDev = import.meta.env.DEV
-
-import { CircleGeometry, Mesh, MeshBasicMaterial } from 'three'
-
 import { EAnimationTargets } from '../../../enums/animations.enums'
 import { EGameObjects } from '../../../enums/objects.enums'
 import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
@@ -16,19 +12,11 @@ import {
 } from './AttacksManager.types'
 import { createAttack } from './helpers/CreateAttack/CreateAttack'
 
-const targetMesh = new Mesh(
-    new CircleGeometry(0.15),
-    new MeshBasicMaterial({ color: 'pink', depthWrite: false }),
-)
-targetMesh.renderOrder = 4
-
 export const createAttacksManager: TCreateAttacksManager = ({
     ResourceTracker,
     AnimationManager,
     CollisionsManager,
 }) => {
-    ResourceTracker.trackResource({ id: 'sight', resource: targetMesh })
-
     const state: IAttacksManagerState = {
         attacks: [],
     }
@@ -50,8 +38,6 @@ export const createAttacksManager: TCreateAttacksManager = ({
             id: `${attack.id}_${crypto.randomUUID()}`,
             resource: attack.attackMesh.clone(),
         }
-
-        if (isDev) targetMesh.position.copy(targetPosition)
 
         ResourceTracker.trackResource(attackInstance)
 

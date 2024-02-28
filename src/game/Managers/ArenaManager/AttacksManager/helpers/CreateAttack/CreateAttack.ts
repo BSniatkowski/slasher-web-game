@@ -17,7 +17,7 @@ export const createAttack: TCreateAttack = ({ id, owner, target, type }) => {
         target,
         actualCooldown: 0,
         cooldown: 30,
-        attackSpeed: 0.1,
+        attackSpeed: 0.05,
         range: 3,
         collisionRadius: 0.25,
         instances: [],

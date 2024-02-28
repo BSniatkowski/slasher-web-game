@@ -4,6 +4,7 @@ import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
 import { createAnimationManager } from './Managers/AnimationsManager/AnimationsManager'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
 import { createCollisionsManager } from './Managers/CollisionsManager/CollisionsManager'
+import { createLightingManager } from './Managers/LightingManager/LightingManager'
 import { createPathfindingManager } from './Managers/PathfindingManager/PathfindingManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 
@@ -14,6 +15,7 @@ export const initializeGame: TInitializeGame = (ref) => {
 
     Renderer.setSize(window.innerWidth - 18, window.innerHeight)
     Renderer.setPixelRatio(window.devicePixelRatio)
+    Renderer.shadowMap.enabled = true
 
     if (ref.current) ref.current.appendChild(Renderer.domElement)
 
@@ -24,6 +26,8 @@ export const initializeGame: TInitializeGame = (ref) => {
     const AnimationManager = createAnimationManager()
 
     const CollisionsManager = createCollisionsManager()
+
+    const LightingManager = createLightingManager({ ResourceTracker })
 
     const ArenaManager = createArenaManager({
         ref: Renderer.domElement,
@@ -39,9 +43,13 @@ export const initializeGame: TInitializeGame = (ref) => {
     }
 
     const populate = () => {
-        ArenaManager.generateBoard()
+        const { boundries } = ArenaManager.generateBoard()
+
         PathfindingManager.init()
         ArenaManager.populate()
+        LightingManager.init()
+
+        LightingManager.updateBoardBoundries(boundries)
     }
 
     const animate: TAnimate = async () => {
@@ -50,6 +58,8 @@ export const initializeGame: TInitializeGame = (ref) => {
         CollisionsManager.tick()
         await ArenaManager.tick()
         AnimationManager.animate()
+        LightingManager.tick()
+
         Renderer.render(Scene, Camera)
 
         await new Promise(requestAnimationFrame).then(animate)

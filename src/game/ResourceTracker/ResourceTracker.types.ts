@@ -1,8 +1,10 @@
-import { Line, Mesh, Scene } from 'three'
+import { DirectionalLight, HemisphereLight, Line, Mesh, Object3D, Scene } from 'three'
+
+export type TResource = Mesh | Line | DirectionalLight | HemisphereLight | Object3D | undefined
 
 export interface ITrackedResource {
     id: string
-    resource: Mesh | Line
+    resource: TResource
 }
 
 export interface IResourceTrackerState {
@@ -12,7 +14,7 @@ export interface IResourceTrackerState {
 
 export type TTrackResource = (resource: ITrackedResource) => void
 
-export type TGetTrackedResource = (id: string) => Mesh | Line | undefined
+export type TGetTrackedResource = (id: string) => TResource
 
 export type TDisposeTrackedResource = (id: string) => void
 

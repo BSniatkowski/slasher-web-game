@@ -1,4 +1,5 @@
 const isDev = import.meta.env.DEV
+const showDebugHelpers = import.meta.env.SHOW_DEBUG_HELPERS as boolean
 
 import {
     BufferGeometry,
@@ -7,7 +8,7 @@ import {
     LineBasicMaterial,
     MathUtils,
     Mesh,
-    MeshBasicMaterial,
+    MeshLambertMaterial,
     Raycaster,
     Vector2,
     Vector3,
@@ -57,15 +58,13 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
     const initPlayer = () => {
         const geometry = new CylinderGeometry(0.25, 0.25, 0.5, 16)
-        const material = new MeshBasicMaterial({
+        const material = new MeshLambertMaterial({
             color: 'green',
-            depthTest: false,
-            depthWrite: false,
         })
 
         const playerMesh = new Mesh(geometry, material)
+        playerMesh.castShadow = true
         playerMesh.matrixAutoUpdate = false
-        playerMesh.renderOrder = 4
 
         playerMesh.rotateX(MathUtils.degToRad(90))
 
@@ -94,7 +93,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     }
 
     const initPathVisialization = () => {
-        if (!isDev || !state.player) return
+        if (!isDev || !showDebugHelpers || !state.player) return
 
         const path3D = [state.player.position.clone()]
 
@@ -102,12 +101,11 @@ export const createPlayerManager: TCreatePlayerManager = ({
         const material = new LineBasicMaterial({
             color: 'purple',
             depthTest: false,
-            depthWrite: false,
         })
 
         const pathMesh = new Line(geometry, material)
         pathMesh.matrixAutoUpdate = false
-        pathMesh.renderOrder = 2
+        pathMesh.renderOrder = 1
 
         state.pathMesh = pathMesh
 
@@ -147,7 +145,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
             destinationPosition,
         })
 
-        if (isDev && path) visualizePath({ path })
+        if (isDev && showDebugHelpers && path) visualizePath({ path })
 
         AnimationManager.clearAnimation(EAnimationTargets.PLAYER_MOVE)
 

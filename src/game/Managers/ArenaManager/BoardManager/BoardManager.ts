@@ -1,3 +1,4 @@
+import { EGameObjects } from '../../../enums/objects.enums'
 import { IBoardState, TCreateBoardManager, TGenerateBoard } from './BoardManager.types'
 import { createBaseBoard } from './helpers/createBaseBoard/createBaseBoard'
 import { createBoardFeatures } from './helpers/createBoardFeatures/createBoardFeatures'
@@ -28,12 +29,12 @@ export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => 
 
         const boardModel = createBoardModel({ board: boardWithFeatures })
 
-        boardModel.matrixAutoUpdate = false
-        boardModel.updateMatrix()
+        // boardModel.matrixAutoUpdate = false
+        // boardModel.updateMatrix()
 
         state.boardModel = boardModel
 
-        ResourceTracker.trackResource({ id: 'board', resource: boardModel })
+        ResourceTracker.trackResource({ id: EGameObjects.BOARD, resource: boardModel })
 
         return { x: -0.5, y: -0.5, w: maxSize.x + 1, h: maxSize.y + 1 } // TODO - correct first points at model creating to remove those -0.5
     }

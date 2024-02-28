@@ -1,4 +1,4 @@
-import { CylinderGeometry, MathUtils, Mesh, MeshBasicMaterial } from 'three'
+import { CylinderGeometry, MathUtils, Mesh, MeshLambertMaterial } from 'three'
 
 import {
     TCreateEnemyManager,
@@ -27,15 +27,13 @@ export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTr
 
     const init: TInitEnemy = (initialPosition) => {
         const geometry = new CylinderGeometry(0.2, 0.2, 0.25, 8)
-        const material = new MeshBasicMaterial({
+        const material = new MeshLambertMaterial({
             color: 'yellow',
-            depthTest: false,
-            depthWrite: false,
         })
 
         const enemyMesh = new Mesh(geometry, material)
+        enemyMesh.castShadow = true
         enemyMesh.matrixAutoUpdate = false
-        enemyMesh.renderOrder = 3
 
         enemyMesh.rotateX(MathUtils.degToRad(90))
 

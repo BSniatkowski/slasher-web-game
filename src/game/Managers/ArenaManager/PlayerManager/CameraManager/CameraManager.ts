@@ -12,8 +12,8 @@ export const createCameraManager: TCreateCameraManager = ({ Camera, playerManage
 
         if (!playerPosition) return
 
-        const cameraDistanceToPlayer = 10
-        const cameraAngleX = 15
+        const cameraDistanceToPlayer = 3
+        const cameraAngleX = 20
 
         const cameraPosition = new Vector3(
             playerPosition.x +

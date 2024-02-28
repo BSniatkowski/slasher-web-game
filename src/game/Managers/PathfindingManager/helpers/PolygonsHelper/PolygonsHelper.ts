@@ -1,4 +1,5 @@
 const isDev = import.meta.env.DEV
+const showDebugHelpers = import.meta.env.SHOW_DEBUG_HELPERS as boolean
 
 import { CircleGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three'
 
@@ -13,7 +14,7 @@ export const PolygonsHelper: TPolygonsHelper = ({ ResourceTracker, board }) => {
         polygons.push(new Vector2(pointsArray[polygonIndex], pointsArray[polygonIndex + 1]))
     }
 
-    if (!isDev) return { polygons }
+    if (!isDev || !showDebugHelpers) return { polygons }
 
     const polygonGeometry = new CircleGeometry(0.05, 12)
     const polygonMaterial = new MeshBasicMaterial({

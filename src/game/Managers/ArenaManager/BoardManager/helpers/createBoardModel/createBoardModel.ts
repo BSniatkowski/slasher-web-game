@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, Mesh, MeshBasicMaterial } from 'three'
+import { BufferAttribute, BufferGeometry, Mesh, MeshLambertMaterial } from 'three'
 
 import { EBoardAreaType } from '../createBoardFeatures/createBoardFeatures.type'
 import { TCreateBoardModel } from './createBoardModel.type'
@@ -174,8 +174,13 @@ export const createBoardModel: TCreateBoardModel = ({ board }) => {
 
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(vertices, 3))
+    geometry.computeVertexNormals()
 
-    const material = new MeshBasicMaterial({ color: 'gray' })
+    const material = new MeshLambertMaterial({ color: 'grey' })
 
-    return new Mesh(geometry, material)
+    const boardMesh = new Mesh(geometry, material)
+    boardMesh.castShadow = false
+    boardMesh.receiveShadow = true
+
+    return boardMesh
 }

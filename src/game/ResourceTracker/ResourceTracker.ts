@@ -15,9 +15,18 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
     const state: IResourceTrackerState = { Scene, resources: [] }
 
     const trackResource: TTrackResource = (resourceItem) => {
-        if (isDev && allLogs) console.log(`Resource of id: ${resourceItem.id} is now tracked.`)
+        if (!(resourceItem?.id && resourceItem?.resource)) {
+            if (isDev && allLogs)
+                console.log(
+                    `Resource of id: ${resourceItem.id} is incorrect and was not added to Scene and tracking.`,
+                )
+
+            return
+        }
 
         state.resources = [...state.resources, resourceItem]
+
+        if (isDev && allLogs) console.log(`Resource of id: ${resourceItem.id} is now tracked.`)
 
         Scene.add(resourceItem.resource)
     }
@@ -39,9 +48,17 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
             return
         }
 
-        Scene.remove(resource)
-        resource.geometry.dispose()
+        // @ts-expect-error I don't know why I cannot check if parameter exists and then do something. To further research
+        if (resource.isDirectionalLight || resource.isHemisphereLight) {
+            // @ts-expect-error -||-
+            resource.dispose()
+        } else {
+            Scene.remove(resource)
+            // @ts-expect-error -||-
+            resource.geometry.dispose()
+        }
 
+        // @ts-expect-error -||-
         if (!resource.material) return
 
         const updateStateArray = () => {
@@ -53,11 +70,18 @@ export const createResourceTracker: TCreateResourceTracker = (Scene) => {
             ]
         }
 
-        if (Array.isArray(resource.material)) {
+        if (
+            // @ts-expect-error -||-
+            Array.isArray(resource.material) &&
+            // @ts-expect-error I don't know why I cannot check if parameter exists and then do something. To further research
+            !(resource.isDirectionalLight || resource.isHemisphereLight)
+        ) {
+            // @ts-expect-error -||-
             for (const material of resource.material) {
                 material.dispose()
             }
         } else {
+            // @ts-expect-error -||-
             resource.material.dispose()
         }
 

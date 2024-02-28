@@ -41,6 +41,8 @@ export const createArenaManager: TCreateArenaManager = ({
         const boundries = BoardManager.generateBoard()
 
         CollisionsManager.updateBoardBoundries(boundries)
+
+        return { boundries }
     }
 
     const populate = () => {

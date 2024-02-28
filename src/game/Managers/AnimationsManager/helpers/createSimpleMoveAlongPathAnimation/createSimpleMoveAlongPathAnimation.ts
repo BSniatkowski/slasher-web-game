@@ -11,8 +11,8 @@ export const createSimpleMoveAlongPathAnimation: TCreateSimpleMoveAlongPathAnima
     positionUpdate,
 }) => {
     const state: IMoveAlongPathAnimationState = {
-        startClone: start.clone(),
-        destinationClone: destination.clone().normalize().multiplyScalar(range),
+        startClone: start,
+        destinationClone: destination.sub(start).setLength(range).add(start),
     }
 
     const findNextPosition: TFindNextPosition = (lerpAlpha) => {

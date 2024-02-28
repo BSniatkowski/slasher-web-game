@@ -13,10 +13,11 @@ import {
     Vector3,
 } from 'three'
 
-import { PLAYER_MOVE } from '../../../consts/animations.consts'
-import { BOARD, PLAYER, PLAYER_PATH_VISUALIZATION } from '../../../consts/objects.consts'
+import { EAnimationTargets } from '../../../enums/animations.enums'
+import { EGameObjects } from '../../../enums/objects.enums'
 import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
 import { createDynamicMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
+import { EAttackTypes } from '../AttacksManager/AttacksManager.types'
 import { createCameraManager } from './CameraManager/CameraManager'
 import { createInputsManager } from './InputsManager/InputsManager'
 import { IPlayerManagerState, TCreatePlayerManager, TUpdatePointer } from './PlayerManager.types'
@@ -28,6 +29,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     PathfindingManager,
     AnimationManager,
     CollisionsManager,
+    AttacksManager,
 }) => {
     const state: IPlayerManagerState = {
         player: null,
@@ -69,7 +71,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         state.player = playerMesh
 
-        ResourceTracker.trackResource({ id: PLAYER, resource: playerMesh })
+        ResourceTracker.trackResource({ id: EGameObjects.PLAYER, resource: playerMesh })
 
         const node = PathfindingManager.getRandomNode()
 
@@ -80,8 +82,14 @@ export const createPlayerManager: TCreatePlayerManager = ({
         updatePlayerPosition(initialPosition)
 
         CollisionsManager.addCollisionsItem({
-            id: PLAYER,
+            id: EGameObjects.PLAYER,
             positionGetter: () => state.player?.position,
+        })
+
+        AttacksManager.addAttack({
+            owner: state.player,
+            target: EGameObjects.ENEMY,
+            type: EAttackTypes.projectile,
         })
     }
 
@@ -103,7 +111,10 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         state.pathMesh = pathMesh
 
-        ResourceTracker.trackResource({ id: PLAYER_PATH_VISUALIZATION, resource: pathMesh })
+        ResourceTracker.trackResource({
+            id: EGameObjects.PLAYER_PATH_VISUALIZATION,
+            resource: pathMesh,
+        })
     }
 
     const visualizePath = ({ path }: { path: Array<Vector3> }) => {
@@ -116,7 +127,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
     const goToPosition = async () => {
         state.raycaster.setFromCamera(state.pointer, Camera)
 
-        const board = ResourceTracker.getTrackedResource(BOARD)
+        const board = ResourceTracker.getTrackedResource(EGameObjects.BOARD)
 
         if (!board) return
 
@@ -131,14 +142,14 @@ export const createPlayerManager: TCreatePlayerManager = ({
         const destinationPosition = destination.clone()
 
         const path = await PathfindingManager.findPath({
-            id: PLAYER_MOVE,
+            id: EAnimationTargets.PLAYER_MOVE,
             startPosition,
             destinationPosition,
         })
 
         if (isDev && path) visualizePath({ path })
 
-        AnimationManager.clearAnimation(PLAYER_MOVE)
+        AnimationManager.clearAnimation(EAnimationTargets.PLAYER_MOVE)
 
         if (path.length === 0) return
 
@@ -152,7 +163,7 @@ export const createPlayerManager: TCreatePlayerManager = ({
                 : true
 
         AnimationManager.addAnimation({
-            id: PLAYER_MOVE,
+            id: EAnimationTargets.PLAYER_MOVE,
             type: EAnimationTypes.dynamic,
             callback: createDynamicMoveAlongPathAnimation({
                 path,
@@ -198,14 +209,6 @@ export const createPlayerManager: TCreatePlayerManager = ({
 
         state.enemiesInRange = CollisionsManager.findItemsInRange(range)
     }
-
-    const createProjectile = () => {
-
-    }
-
-    const attack = () => {
-
-    } 
 
     const tick = async () => {
         updateEnemiesInRange()

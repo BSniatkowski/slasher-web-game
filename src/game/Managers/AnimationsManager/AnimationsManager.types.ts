@@ -3,16 +3,19 @@ export enum EAnimationTypes {
     dynamic,
 }
 
-export interface ISimpleAnimation {
+export interface IAnimationBase {
     id: string
+    onEnded?: () => void
+}
+
+export interface ISimpleAnimation extends IAnimationBase {
     type: EAnimationTypes.simple
     tick: number
     ticksDuration: number
     callback: ({ tick, ticksDuration }: { tick: number; ticksDuration: number }) => void
 }
 
-export interface IDynamicAnimation {
-    id: string
+export interface IDynamicAnimation extends IAnimationBase {
     type: EAnimationTypes.dynamic
     isPossibleGetter: () => boolean
     isEndedGetter: () => boolean

@@ -41,7 +41,7 @@ export const createEnemyManager: TCreateEnemyManager = ({ enemyStats, ResourceTr
 
         state.enemyMesh = enemyMesh
 
-        ResourceTracker.trackResource({ id: `enemy_${state.id}`, resource: enemyMesh })
+        ResourceTracker.trackResource({ id: state.id, resource: enemyMesh })
 
         move(initialPosition)
     }

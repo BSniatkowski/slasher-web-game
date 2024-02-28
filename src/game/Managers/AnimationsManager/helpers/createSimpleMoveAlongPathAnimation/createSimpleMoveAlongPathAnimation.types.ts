@@ -9,14 +9,9 @@ export type TFindLerpBetweenPathPoints = () => number
 
 export type TFindNextPosition = (lerpAlpha: number) => Vector3
 
-export type TCreateSimpleMoveAlongPathAnimation = ({
-    start,
-    destination,
-    range,
-    positionUpdate,
-}: {
+export type TCreateSimpleMoveAlongPathAnimation = (props: {
     start: Vector3
     destination: Vector3
     range: number
     positionUpdate: (position: Vector3) => void
-}) => ({ tick, ticksDuration }: { tick: number; ticksDuration: number }) => void
+}) => (props: { tick: number; ticksDuration: number }) => void

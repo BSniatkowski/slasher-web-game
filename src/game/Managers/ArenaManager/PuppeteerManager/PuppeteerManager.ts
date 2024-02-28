@@ -1,13 +1,18 @@
 import { Vector3 } from 'three'
 
-import { ENEMY_MOVE } from '../../../consts/animations.consts'
-import { PLAYER } from '../../../consts/objects.consts'
+import { EAnimationTargets } from '../../../enums/animations.enums'
+import { EGameObjects } from '../../../enums/objects.enums'
 import { EAnimationTypes } from '../../AnimationsManager/AnimationsManager.types'
 import { createDynamicMoveAlongPathAnimation } from '../../AnimationsManager/helpers/createDynamicMoveAlongPathAnimation/createDynamicMoveAlongPathAnimation'
+import { ICollision } from '../AttacksManager/AttacksManager.types'
 import { createEnemyManager } from '../EnemyManager/EnemyManager'
 import { IEnemy } from '../EnemyManager/EnemyManager.types'
 import { createEnemy } from '../EnemyManager/helpers/createEnemy/createEnemy'
-import { IPuppeteerManagerState, TCreatePuppeteerManager } from './PuppeteerManager.types'
+import {
+    IPuppeteerManagerState,
+    TCreatePuppeteerManager,
+    TPuppeteerManagerTick,
+} from './PuppeteerManager.types'
 
 const closeEnemiesDistance = 5
 
@@ -28,7 +33,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
         const maxEnemies = Math.round(Math.random() * 49) + 1
 
         for (let enemyIndex = 0; enemyIndex < maxEnemies; enemyIndex++) {
-            const id = crypto.randomUUID()
+            const id = `${EGameObjects.ENEMY}_${crypto.randomUUID()}`
 
             const enemyStats = createEnemy({ id })
 
@@ -56,6 +61,21 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
         createEnemies()
     }
 
+    const removeEnemy = (id: string) => {
+        if (!state.enemies) return
+
+        CollisionsManager.removeCollisionsItem(id)
+        AnimationManager.clearAnimation(`${EAnimationTargets.ENEMY_MOVE}_${id}`)
+        ResourceTracker.disposeTrackedResource(id)
+        state.enemies.delete(id)
+    }
+
+    const removeEnemies = (collisions: Array<ICollision>) => {
+        for (const collision of collisions) {
+            removeEnemy(collision.secondItemId)
+        }
+    }
+
     const moveEnemies = async () => {
         if (!state.lastPlayerPosition) return
 
@@ -68,7 +88,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
 
             if (!currentEnemyPosition) continue
 
-            const animationId = `${ENEMY_MOVE}${enemy.getId()}`
+            const animationId = `${EAnimationTargets.ENEMY_MOVE}_${enemy.getId()}`
 
             const isPossibleGetter = () => true
 
@@ -145,7 +165,7 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
     }
 
     const checkAndUpdateLastPlayerPosition = async () => {
-        const player = ResourceTracker.getTrackedResource(PLAYER)
+        const player = ResourceTracker.getTrackedResource(EGameObjects.PLAYER)
 
         if (!player || state.lastPlayerPosition?.equals(player.position)) {
             return
@@ -156,7 +176,8 @@ export const createPuppeteerManager: TCreatePuppeteerManager = ({
         await checkAndUpdateLastPlayerNode(player.position)
     }
 
-    const tick = async () => {
+    const tick: TPuppeteerManagerTick = async (collisions) => {
+        removeEnemies(collisions)
         await checkAndUpdateLastPlayerPosition()
     }
 

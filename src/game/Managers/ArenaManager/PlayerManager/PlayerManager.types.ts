@@ -12,6 +12,7 @@ import { TResourceTracker } from '../../../ResourceTracker/ResourceTracker.types
 import { TAnimationManager } from '../../AnimationsManager/AnimationsManager.types'
 import { ICollisionItem, TCollisionsManager } from '../../CollisionsManager/CollisionsManager.types'
 import { TPathfindingManager } from '../../PathfindingManager/PathfindingManager.types'
+import { TAttacksManager } from '../AttacksManager/AttacksManager.types'
 
 export interface IPlayerManagerState {
     player: null | Mesh<CylinderGeometry, MeshBasicMaterial>
@@ -26,20 +27,14 @@ export interface IPlayerManagerState {
 
 export type TUpdatePointer = (event: PointerEvent) => void
 
-export type TCreatePlayerManager = ({
-    ref,
-    Camera,
-    ResourceTracker,
-    PathfindingManager,
-    AnimationManager,
-    CollisionsManager,
-}: {
+export type TCreatePlayerManager = (props: {
     ref: HTMLCanvasElement
     Camera: PerspectiveCamera
     ResourceTracker: TResourceTracker
     PathfindingManager: TPathfindingManager
     AnimationManager: TAnimationManager
     CollisionsManager: TCollisionsManager
+    AttacksManager: TAttacksManager
 }) => {
     init: () => void
     tick: () => Promise<void>

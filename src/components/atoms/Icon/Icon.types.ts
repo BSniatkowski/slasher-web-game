@@ -14,6 +14,8 @@ export type TIconVariants =
     | 'expand'
     | 'dot'
     | 'dotActive'
+    | 'play'
+    | 'pause'
 export interface IIconProps {
     size?: TSizes
     variant?: TIconVariants

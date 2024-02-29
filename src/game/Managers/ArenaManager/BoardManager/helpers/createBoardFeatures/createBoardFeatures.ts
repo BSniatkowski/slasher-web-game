@@ -121,64 +121,80 @@ export const createBoardFeatures: TCreateBoardFeatures = ({ walkableBoard }) => 
             areaOnLeft === EBoardAreaType.square &&
             areaBelow === EBoardAreaType.empty &&
             areaOnRight === EBoardAreaType.empty
-        )
+        ) {
             area.type = EBoardAreaType.solidLeftSquare
+            continue
+        }
 
         if (
             areaAbove === EBoardAreaType.square &&
             areaOnLeft === EBoardAreaType.empty &&
             areaBelow === EBoardAreaType.empty &&
             areaOnRight === EBoardAreaType.empty
-        )
+        ) {
             area.type = EBoardAreaType.solidTopSquare
+            continue
+        }
 
         if (
             areaAbove === EBoardAreaType.empty &&
             areaOnLeft === EBoardAreaType.empty &&
             areaBelow === EBoardAreaType.empty &&
             areaOnRight === EBoardAreaType.square
-        )
+        ) {
             area.type = EBoardAreaType.solidRightSquare
+            continue
+        }
 
         if (
             areaAbove === EBoardAreaType.empty &&
             areaOnLeft === EBoardAreaType.empty &&
             areaBelow === EBoardAreaType.square &&
             areaOnRight === EBoardAreaType.empty
-        )
+        ) {
             area.type = EBoardAreaType.solidBottomSquare
+            continue
+        }
 
         if (
             areaAbove === EBoardAreaType.empty &&
             areaOnLeft === EBoardAreaType.empty &&
             (areaBelow === EBoardAreaType.square || isOneOfSmooth(areaBelow)) &&
             (areaOnRight === EBoardAreaType.square || isOneOfSmooth(areaOnRight))
-        )
+        ) {
             area.type = EBoardAreaType.smoothTopLeftSquare
+            continue
+        }
 
         if (
             areaAbove === EBoardAreaType.empty &&
             (areaOnLeft === EBoardAreaType.square || isOneOfSmooth(areaOnLeft)) &&
             (areaBelow === EBoardAreaType.square || isOneOfSmooth(areaBelow)) &&
             areaOnRight === EBoardAreaType.empty
-        )
+        ) {
             area.type = EBoardAreaType.smoothTopRightSquare
+            continue
+        }
 
         if (
             (areaAbove === EBoardAreaType.square || isOneOfSmooth(areaAbove)) &&
             (areaOnLeft === EBoardAreaType.square || isOneOfSmooth(areaOnLeft)) &&
             areaBelow === EBoardAreaType.empty &&
             areaOnRight === EBoardAreaType.empty
-        )
+        ) {
             area.type = EBoardAreaType.smoothBottomRightSquare
+            continue
+        }
 
         if (
             (areaAbove === EBoardAreaType.square || isOneOfSmooth(areaAbove)) &&
             areaOnLeft === EBoardAreaType.empty &&
             areaBelow === EBoardAreaType.empty &&
             (areaOnRight === EBoardAreaType.square || isOneOfSmooth(areaOnRight))
-        )
+        ) {
             area.type = EBoardAreaType.smoothBottomLeftSquare
+            continue
+        }
     }
 
     return boardWithFeatures

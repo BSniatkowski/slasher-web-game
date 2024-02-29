@@ -1,6 +1,14 @@
 import { PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from 'three'
 
-import { TAnimate, TDispose, TInitializeGame, TPause } from './game.types'
+import {
+    IGeneralState,
+    TAnimate,
+    TCreateGame,
+    TDispose,
+    TOnWindowResize,
+    TSetOnGeneralStateChangeCallback,
+    TTogglePause,
+} from './game.types'
 import { createAnimationManager } from './Managers/AnimationsManager/AnimationsManager'
 import { createArenaManager } from './Managers/ArenaManager/ArenaManager'
 import { createCollisionsManager } from './Managers/CollisionsManager/CollisionsManager'
@@ -8,12 +16,12 @@ import { createLightingManager } from './Managers/LightingManager/LightingManage
 import { createPathfindingManager } from './Managers/PathfindingManager/PathfindingManager'
 import { createResourceTracker } from './ResourceTracker/ResourceTracker'
 
-export const initializeGame: TInitializeGame = (ref) => {
+export const createGame: TCreateGame = (ref) => {
     const Scene = new ThreeScene()
-    const Camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    const Camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10)
     const Renderer = new WebGLRenderer({ antialias: true })
 
-    Renderer.setSize(window.innerWidth - 18, window.innerHeight)
+    Renderer.setSize(window.innerWidth, window.innerHeight)
     Renderer.setPixelRatio(window.devicePixelRatio)
     Renderer.shadowMap.enabled = true
 
@@ -38,8 +46,20 @@ export const initializeGame: TInitializeGame = (ref) => {
         CollisionsManager,
     })
 
-    const generalState = {
+    const generalState: IGeneralState = {
         isPaused: false,
+        onGeneralStateChangeCallback: null,
+    }
+
+    const setOnGeneralStateChangeCallback: TSetOnGeneralStateChangeCallback = (callback) => {
+        if (typeof callback === 'function') generalState.onGeneralStateChangeCallback = callback
+    }
+
+    const onGeneralStateChange = () => {
+        if (typeof generalState.onGeneralStateChangeCallback !== 'function') return
+        const { isPaused } = generalState
+
+        generalState.onGeneralStateChangeCallback({ isPaused })
     }
 
     const populate = () => {
@@ -52,25 +72,57 @@ export const initializeGame: TInitializeGame = (ref) => {
         LightingManager.updateBoardBoundries(boundries)
     }
 
+    const animateLimiterState = {
+        then: Date.now(),
+        maxFps: 1000 / 60, // 60 fps
+    }
+
     const animate: TAnimate = async () => {
         if (generalState.isPaused) return
 
-        CollisionsManager.tick()
-        await ArenaManager.tick()
-        AnimationManager.animate()
-        LightingManager.tick()
+        const now = Date.now()
+        const elapsed = now - animateLimiterState.then
 
-        Renderer.render(Scene, Camera)
+        if (elapsed > animateLimiterState.maxFps) {
+            animateLimiterState.then = now - (elapsed % animateLimiterState.maxFps)
+
+            CollisionsManager.tick()
+            await ArenaManager.tick()
+            AnimationManager.animate()
+            LightingManager.tick()
+
+            Renderer.render(Scene, Camera)
+        }
 
         await new Promise(requestAnimationFrame).then(animate)
     }
 
-    const pause: TPause = () => {
+    const togglePause: TTogglePause = async () => {
+        if (generalState.isPaused) {
+            generalState.isPaused = false
+
+            animate()
+
+            onGeneralStateChange()
+            return
+        }
+
         generalState.isPaused = true
+
+        onGeneralStateChange()
+    }
+
+    const onWindowResize: TOnWindowResize = ({ width, height }) => {
+        if (!generalState.isPaused) togglePause()
+
+        Camera.aspect = width / height
+        Camera.updateProjectionMatrix()
+        Renderer.setSize(width, height)
+        Renderer.render(Scene, Camera)
     }
 
     const dispose: TDispose = () => {
-        pause()
+        togglePause()
         ResourceTracker.disposeAllResources()
         PathfindingManager.dispose()
 
@@ -81,5 +133,5 @@ export const initializeGame: TInitializeGame = (ref) => {
     populate()
     animate()
 
-    return { animate, pause, dispose }
+    return { animate, setOnGeneralStateChangeCallback, togglePause, onWindowResize, dispose }
 }

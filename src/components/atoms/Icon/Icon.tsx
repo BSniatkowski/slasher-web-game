@@ -7,6 +7,8 @@ import facebook from '/icons/facebook.svg?raw'
 import instagram from '/icons/instagram.svg?raw'
 import menu from '/icons/menu.svg?raw'
 import merch from '/icons/merch.svg?raw'
+import pause from '/icons/pause.svg?raw'
+import play from '/icons/play.svg?raw'
 import send from '/icons/send.svg?raw'
 import share from '/icons/share.svg?raw'
 import tiktok from '/icons/tiktok.svg?raw'
@@ -32,6 +34,8 @@ const Icon = ({ size = 'normal', variant = 'close', onClick }: IIconProps) => {
         expand: expand,
         dot: dot,
         dotActive: dotActive,
+        play: play,
+        pause: pause,
     }[variant]
     return (
         <S.IconWrapper

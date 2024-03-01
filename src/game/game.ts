@@ -51,15 +51,18 @@ export const createGame: TCreateGame = (ref) => {
         onGeneralStateChangeCallback: null,
     }
 
-    const setOnGeneralStateChangeCallback: TSetOnGeneralStateChangeCallback = (callback) => {
-        if (typeof callback === 'function') generalState.onGeneralStateChangeCallback = callback
-    }
-
     const onGeneralStateChange = () => {
         if (typeof generalState.onGeneralStateChangeCallback !== 'function') return
         const { isPaused } = generalState
 
         generalState.onGeneralStateChangeCallback({ isPaused })
+    }
+
+    const setOnGeneralStateChangeCallback: TSetOnGeneralStateChangeCallback = (callback) => {
+        if (typeof callback !== 'function') return
+
+        generalState.onGeneralStateChangeCallback = callback
+        onGeneralStateChange()
     }
 
     const populate = () => {

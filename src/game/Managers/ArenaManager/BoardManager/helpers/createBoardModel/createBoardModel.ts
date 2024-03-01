@@ -1,5 +1,6 @@
 import { BufferAttribute, BufferGeometry, Mesh, MeshLambertMaterial } from 'three'
 
+import { IPoint } from '../../../../PathfindingManager/helpers/GraphTraverse/GraphTraverse.types'
 import { EBoardAreaType } from '../createBoardFeatures/createBoardFeatures.type'
 import { TCreateBoardModel } from './createBoardModel.type'
 
@@ -170,10 +171,52 @@ export const createBoardModel: TCreateBoardModel = ({ board }) => {
         }
     }
 
-    const vertices = new Float32Array(areas)
+    const uniquePoints: Array<(IPoint & { z: number; index: number }) | number> = []
+
+    let index = 0
+
+    for (let areasPointIndex = 0; areasPointIndex < areas.length; areasPointIndex += 3) {
+        const point = {
+            index,
+            x: areas[areasPointIndex],
+            y: areas[areasPointIndex + 1],
+            z: areas[areasPointIndex + 2],
+        }
+
+        const foundPoint = uniquePoints.find(
+            (uniquePoint) =>
+                typeof uniquePoint === 'object' &&
+                uniquePoint.x === point.x &&
+                uniquePoint.y === point.y &&
+                uniquePoint.z === point.z,
+        )
+
+        if (foundPoint && typeof foundPoint === 'object') {
+            uniquePoints.push(foundPoint.index)
+            continue
+        }
+
+        index++
+        uniquePoints.push(point)
+    }
+
+    const vertices: Array<number> = []
+    const indices = []
+
+    for (const uniquePoint of uniquePoints) {
+        if (typeof uniquePoint === 'object') {
+            indices.push(uniquePoint.index)
+            vertices.push(uniquePoint.x, uniquePoint.y, uniquePoint.z)
+            continue
+        }
+
+        indices.push(uniquePoint)
+    }
 
     const geometry = new BufferGeometry()
-    geometry.setAttribute('position', new BufferAttribute(vertices, 3))
+
+    geometry.setIndex(indices)
+    geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices), 3))
     geometry.computeVertexNormals()
 
     const material = new MeshLambertMaterial({ color: 'grey' })
@@ -181,6 +224,8 @@ export const createBoardModel: TCreateBoardModel = ({ board }) => {
     const boardMesh = new Mesh(geometry, material)
     boardMesh.castShadow = false
     boardMesh.receiveShadow = true
+    boardMesh.matrixAutoUpdate = false
+    boardMesh.updateMatrix()
 
     return boardMesh
 }

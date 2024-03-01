@@ -1,4 +1,4 @@
-import { Point } from '../../../../PathfindingManager/helpers/GraphTraverse/GraphTraverse.types'
+import { IPoint } from '../../../../PathfindingManager/helpers/GraphTraverse/GraphTraverse.types'
 
 export enum EBoardAreaType {
     empty,
@@ -17,7 +17,7 @@ export enum EBoardAreaType {
     smoothBottomLeftSquare,
 }
 
-export type TBoardArea = Point & { type: EBoardAreaType }
+export type TBoardArea = IPoint & { type: EBoardAreaType }
 
 export type TCreateBoardFeatures = ({
     walkableBoard,

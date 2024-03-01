@@ -1,12 +1,12 @@
 import { IGraphNode, TGraph } from '../GraphHelper/GraphHelper.types'
 
-export interface Point {
+export interface IPoint {
     x: number
     y: number
     z?: number
 }
 
-export type TGetTwoDimensionalDistanceBetweenPoints = (pointA: Point, pointB: Point) => number
+export type TGetTwoDimensionalDistanceBetweenPoints = (pointA: IPoint, pointB: IPoint) => number
 
 export type TGraphTraverse = ({
     startPosition,
@@ -15,13 +15,13 @@ export type TGraphTraverse = ({
     destinationNodeId,
     graph,
 }: {
-    startPosition: Point
+    startPosition: IPoint
     startNodeId: string
-    destinationPosition: Point
+    destinationPosition: IPoint
     destinationNodeId: string
     graph: TGraph
 }) => {
-    path: Array<Point>
+    path: Array<IPoint>
 }
 
 export interface IGraphNodeCopy extends IGraphNode {
@@ -40,9 +40,9 @@ export interface IWebWorkerState {
 export interface IWebWorkerCalculatePathData {
     type: 'calculate'
     id: string
-    startPosition: Point
+    startPosition: IPoint
     startNodeId: string
-    destinationPosition: Point
+    destinationPosition: IPoint
     destinationNodeId: string
 }
 

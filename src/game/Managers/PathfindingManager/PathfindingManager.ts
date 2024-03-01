@@ -2,6 +2,7 @@ const isDev = import.meta.env.DEV
 
 import { Mesh, Vector3 } from 'three'
 
+import { EGameObjects } from '../../enums/objects.enums'
 import { CentroidsHelper } from './helpers/CentroidsHelper/CentroidsHelper'
 import { GraphHelper } from './helpers/GraphHelper/GraphHelper'
 import { createNodeChecker } from './helpers/NodeChecker/NodeChecker'
@@ -72,7 +73,7 @@ export const createPathfindingManager: TCreatePathfindingManager = ({ ResourceTr
     }
 
     const init = () => {
-        const board = ResourceTracker.getTrackedResource('board') as Mesh
+        const board = ResourceTracker.getTrackedResource(EGameObjects.BOARD) as Mesh
 
         if (!board) return
 

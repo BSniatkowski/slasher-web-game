@@ -29,9 +29,6 @@ export const createBoardManager: TCreateBoardManager = ({ ResourceTracker }) => 
 
         const boardModel = createBoardModel({ board: boardWithFeatures })
 
-        // boardModel.matrixAutoUpdate = false
-        // boardModel.updateMatrix()
-
         state.boardModel = boardModel
 
         ResourceTracker.trackResource({ id: EGameObjects.BOARD, resource: boardModel })
